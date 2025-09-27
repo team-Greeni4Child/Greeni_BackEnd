@@ -4,16 +4,18 @@ import com.greeni.api.badges.domain.Badge;
 import com.greeni.api.common.BaseEntity;
 import com.greeni.api.profiles.domain.Profile;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Builder
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "ProfileBadgies")
+@DynamicUpdate
+@DynamicInsert
 public class ProfileBadge extends BaseEntity {
 
     @Id
