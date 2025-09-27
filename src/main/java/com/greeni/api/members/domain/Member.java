@@ -3,10 +3,9 @@ package com.greeni.api.members.domain;
 import com.greeni.api.common.BaseEntity;
 import com.greeni.api.profiles.domain.Profile;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +13,11 @@ import java.util.List;
 @Entity
 @Builder
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "members")
+@DynamicUpdate
+@DynamicInsert
 public class Member extends BaseEntity {
 
     @Id
@@ -29,6 +31,7 @@ public class Member extends BaseEntity {
     private String password;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Profile> profileList = new ArrayList<>();
 
     public void encodePassword(String password) {

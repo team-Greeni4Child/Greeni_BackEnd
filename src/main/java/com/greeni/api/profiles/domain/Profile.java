@@ -7,6 +7,8 @@ import com.greeni.api.members.domain.Member;
 import com.greeni.api.profiles.domain.mapping.ProfileBadge;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,8 +17,11 @@ import java.util.List;
 @Entity
 @Builder
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "profiles")
+@DynamicUpdate
+@DynamicInsert
 public class Profile extends BaseEntity {
 
     @Id
@@ -39,11 +44,14 @@ public class Profile extends BaseEntity {
     private Member member;
 
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Diary> diaryList = new ArrayList<>();
 
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Activity> activityList = new ArrayList<>();
 
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<ProfileBadge> profileBadgeList = new ArrayList<>();
 }
