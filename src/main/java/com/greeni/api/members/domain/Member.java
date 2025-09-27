@@ -34,4 +34,8 @@ public class Member extends BaseEntity {
     @Builder.Default
     private List<Profile> profileList = new ArrayList<>();
 
+    public void encodePassword(String password) {
+        this.password = password;
+    }
+
 }
