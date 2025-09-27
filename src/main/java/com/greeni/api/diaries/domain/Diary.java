@@ -12,7 +12,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Diaries")
+@Table(name = "diaries")
 @DynamicUpdate
 @DynamicInsert
 public class Diary extends BaseEntity {

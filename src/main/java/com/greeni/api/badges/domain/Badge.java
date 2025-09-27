@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Badges")
+@Table(name = "badges")
 @DynamicUpdate
 @DynamicInsert
 public class Badge extends BaseEntity {

@@ -19,7 +19,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Profiles")
+@Table(name = "profiles")
 @DynamicUpdate
 @DynamicInsert
 public class Profile extends BaseEntity {

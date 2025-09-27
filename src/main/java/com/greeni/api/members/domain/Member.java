@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Members")
+@Table(name = "members")
 @DynamicUpdate
 @DynamicInsert
 public class Member extends BaseEntity {

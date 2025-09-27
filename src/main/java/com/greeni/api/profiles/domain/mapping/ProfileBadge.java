@@ -13,7 +13,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "ProfileBadgies")
+@Table(name = "profile_badgies")
 @DynamicUpdate
 @DynamicInsert
 public class ProfileBadge extends BaseEntity {
