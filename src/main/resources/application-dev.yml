@@ -20,3 +20,16 @@ spring:
         use_sql_comments: true
         default_batch_fetch_size: 100
     show-sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PW}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
+            required: true
