@@ -11,6 +11,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,6 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -34,27 +36,39 @@ public class MemberService {
     private final RedisTemplate<String, Object> redistemplate;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public MemberResponseDTO.toJoinResultDTO signUpMember(MemberRequestDTO.SignUpDTO request) {
+    public MemberResponseDTO.toMemberResultDTO signUpMember(MemberRequestDTO.SignUpDTO request) {
         // 해당 메일이 이미 존재하는 메일인지 확인
         if(memberRepository.existsByEmail(request.getEmail())){
             throw new GeneralException(ErrorStatus.EXIST_EMAIL);
         }
 
         // 이메일 인증 완료 여부 확인
-        ValueOperations<String, Object> ops = redistemplate.opsForValue();
-        String codeNum = (String) ops.get("EmailCode"+request.getEmail());
-        if(codeNum == null){
-            throw new GeneralException(ErrorStatus.EXPIRED_CODE);
-        }
-        if(!codeNum.equals(request.getCode())){
-            throw new GeneralException(ErrorStatus.WRONG_CODE);
-        }
+        checkEmailCode(request.getEmail(), request.getCode());
+//        ValueOperations<String, Object> ops = redistemplate.opsForValue();
+//        String codeNum = (String) ops.get("EmailCode"+request.getEmail());
+//        if(codeNum == null){
+//            throw new GeneralException(ErrorStatus.EXPIRED_CODE);
+//        }
+//        if(!codeNum.equals(request.getCode())){
+//            throw new GeneralException(ErrorStatus.WRONG_CODE);
+//        }
 
         Member member = MemberConverter.toMember(request);
         member.encodePassword(bCryptPasswordEncoder.encode(member.getPassword()));
         memberRepository.save(member);
 
-        return MemberConverter.toJoinResultDTO(member);
+        return MemberConverter.toMemberResultDTO(member);
+    }
+
+    public void checkEmailCode(String email, String code){
+        ValueOperations<String, Object> ops = redistemplate.opsForValue();
+        String codeNum = (String) ops.get("EmailCode"+email);
+        if(codeNum == null){
+            throw new GeneralException(ErrorStatus.EXPIRED_CODE);
+        }
+        if(!codeNum.equals(code)){
+            throw new GeneralException(ErrorStatus.WRONG_CODE);
+        }
     }
 
     // 이메일 인증 번호 전송
@@ -105,4 +119,21 @@ public class MemberService {
         ops.set("EmailCode"+request.getEmail(), number+"", 180, TimeUnit.SECONDS);
     }
 
+    public MemberResponseDTO.toMemberResultDTO findPw(MemberRequestDTO.PasswdDTO request) {
+        Member member = memberRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new GeneralException(ErrorStatus.NOT_EXIST_EMAIL));
+        // 이메일 인증번호 맞는지 확인
+        checkEmailCode(request.getEmail(), request.getCode());
+        return MemberConverter.toMemberResultDTO(member);
+    }
+
+
+    public MemberResponseDTO.toMemberResultDTO resetPw(MemberRequestDTO.ResetPwDTO request) {
+        Member member = memberRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new GeneralException(ErrorStatus.NOT_EXIST_EMAIL));
+
+        member.encodePassword(bCryptPasswordEncoder.encode(member.getPassword()));
+        memberRepository.save(member);
+        return MemberConverter.toMemberResultDTO(member);
+    }
 }
