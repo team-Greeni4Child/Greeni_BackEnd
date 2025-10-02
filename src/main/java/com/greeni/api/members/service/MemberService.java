@@ -98,6 +98,7 @@ public class MemberService {
             javaMailSender.send(message);
         } catch(MessagingException | UnsupportedEncodingException e){
             log.error("Error Sending email", e);
+            throw new GeneralException(ErrorStatus.NOT_SEND_EMAIL_CODE);
         }
 
         // redis에 인증번호 3분간 저장
