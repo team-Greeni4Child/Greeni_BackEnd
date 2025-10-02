@@ -102,7 +102,7 @@ public class MemberService {
 
         // redis에 인증번호 3분간 저장
         ValueOperations<String, Object> ops = redistemplate.opsForValue();
-        ops.set("EmailCode"+request.getEmail(), number+"", 180, TimeUnit.SECONDS);
+        ops.set("EmailCode"+request.getEmail(), number+"", 200, TimeUnit.SECONDS);
     }
 
 }
