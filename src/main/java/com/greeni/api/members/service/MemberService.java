@@ -120,8 +120,7 @@ public class MemberService {
     }
 
     public MemberResponseDTO.toMemberResultDTO findPw(MemberRequestDTO.PasswdDTO request) {
-        Member member = memberRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new GeneralException(ErrorStatus.NOT_EXIST_EMAIL));
+        Member member = findMemberByEmail(request.getEmail());
         // 이메일 인증번호 맞는지 확인
         checkEmailCode(request.getEmail(), request.getCode());
         return MemberConverter.toMemberResultDTO(member);
@@ -129,11 +128,14 @@ public class MemberService {
 
 
     public MemberResponseDTO.toMemberResultDTO resetPw(MemberRequestDTO.ResetPwDTO request) {
-        Member member = memberRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new GeneralException(ErrorStatus.NOT_EXIST_EMAIL));
+        Member member = findMemberByEmail(request.getEmail());
 
-        member.encodePassword(bCryptPasswordEncoder.encode(member.getPassword()));
+        member.encodePassword(bCryptPasswordEncoder.encode(request.getPassword()));
         memberRepository.save(member);
         return MemberConverter.toMemberResultDTO(member);
+    }
+
+    public Member findMemberByEmail(String email) {
+        return memberRepository.findByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus.NOT_EXIST_EMAIL));
     }
 }
