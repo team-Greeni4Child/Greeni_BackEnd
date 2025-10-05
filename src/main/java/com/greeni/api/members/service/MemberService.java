@@ -123,13 +123,22 @@ public class MemberService {
         Member member = findMemberByEmail(request.getEmail());
         // 이메일 인증번호 맞는지 확인
         checkEmailCode(request.getEmail(), request.getCode());
+        // redis에 비밀번호 재설정함을 저장하기
+        ValueOperations<String, Object> ops = redistemplate.opsForValue();
+        ops.set("chPw"+request.getEmail(), "chPw", 300, TimeUnit.SECONDS);
         return MemberConverter.toMemberResultDTO(member);
     }
 
 
     public MemberResponseDTO.toMemberResultDTO resetPw(MemberRequestDTO.ResetPwDTO request) {
         Member member = findMemberByEmail(request.getEmail());
-
+        // 비밀번호 찾기를 했는지 확인
+        ValueOperations<String, Object> ops = redistemplate.opsForValue();
+        String state = (String) ops.get("chPw" + request.getEmail());
+        if(state == null){
+            throw new GeneralException(ErrorStatus.GO_TO_FINDPW);
+        }
+        // 새 비밀번호 암호화해서 저장하기
         member.encodePassword(bCryptPasswordEncoder.encode(request.getPassword()));
         memberRepository.save(member);
         return MemberConverter.toMemberResultDTO(member);

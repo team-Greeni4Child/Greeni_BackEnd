@@ -19,6 +19,7 @@ public enum ErrorStatus {
     EXPIRED_CODE(HttpStatus.BAD_REQUEST, "MEMBER4002", "이메일 인증코드가 만료되었습니다"),
     WRONG_CODE(HttpStatus.BAD_REQUEST, "MEMBER4003", "이메일 인증코드가 올바르지 않습니다"),
     NOT_EXIST_EMAIL(HttpStatus.BAD_REQUEST, "MEMBER4004", "존재하지 않는 메일입니다"),
+    GO_TO_FINDPW(HttpStatus.BAD_REQUEST, "MEMBER4005", "비밀번호 찾기를 다시 하고 오세요"),
     ;
 
     private final HttpStatus httpStatus;
