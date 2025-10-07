@@ -112,11 +112,12 @@ public class MemberService {
             javaMailSender.send(message);
         } catch(MessagingException | UnsupportedEncodingException e){
             log.error("Error Sending email", e);
+            throw new GeneralException(ErrorStatus.NOT_SEND_EMAIL_CODE);
         }
 
         // redis에 인증번호 3분간 저장
         ValueOperations<String, Object> ops = redistemplate.opsForValue();
-        ops.set("EmailCode"+request.getEmail(), number+"", 180, TimeUnit.SECONDS);
+        ops.set("EmailCode"+request.getEmail(), number+"", 200, TimeUnit.SECONDS);
     }
 
     public MemberResponseDTO.toMemberResultDTO findPw(MemberRequestDTO.PasswdDTO request) {
