@@ -16,8 +16,8 @@ public class MemberConverter {
                 .build();
     }
 
-    public static MemberResponseDTO.toJoinResultDTO toJoinResultDTO(Member member){
-        return MemberResponseDTO.toJoinResultDTO.builder()
+    public static MemberResponseDTO.toMemberResultDTO toMemberResultDTO(Member member){
+        return MemberResponseDTO.toMemberResultDTO.builder()
                 .memberId(member.getId())
                 .createdAt(LocalDateTime.now())
                 .build();
