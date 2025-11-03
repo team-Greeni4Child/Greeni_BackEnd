@@ -1,4 +1,7 @@
 spring:
+  jackson:
+    time-zone: Asia/Seoul
+    date-format: yyyy-MM-dd'T'HH:mm:ss
   config:
     activate:
       on-profile: dev
@@ -15,6 +18,8 @@ spring:
       ddl-auto: create
     properties:
       hibernate:
+        jdbc:
+          time_zone: Asia/Seoul
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
         use_sql_comments: true
@@ -33,3 +38,7 @@ spring:
           starttls:
             enable: true
             required: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
