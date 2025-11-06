@@ -1,7 +1,7 @@
 package com.greeni.api.profiles.domain;
 
 import com.greeni.api.activities.domain.Activity;
-import com.greeni.api.common.BaseEntity;
+import com.greeni.api.common.base.BaseEntity;
 import com.greeni.api.diaries.domain.Diary;
 import com.greeni.api.members.domain.Member;
 import com.greeni.api.profiles.domain.mapping.ProfileBadge;

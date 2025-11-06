@@ -1,4 +1,4 @@
-package com.greeni.api.config;
+package com.greeni.api.common.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
