@@ -1,7 +1,6 @@
 package com.greeni.api.members.controller;
 
-import com.greeni.api.apiPayload.ApiResponse;
-import com.greeni.api.apiPayload.status.SuccessStatus;
+import com.greeni.api.apiPayload.CommonResponse;
 import com.greeni.api.members.dto.MemberRequestDTO;
 import com.greeni.api.members.dto.MemberResponseDTO;
 import com.greeni.api.members.service.MemberService;
@@ -21,28 +20,28 @@ public class MemberController {
 
     @PostMapping("/signup")
     @Operation(summary = "회원가입 API")
-    public ResponseEntity<ApiResponse<MemberResponseDTO.toMemberResultDTO>> signUp(@RequestBody @Valid MemberRequestDTO.SignUpDTO request){
+    public ResponseEntity<CommonResponse<MemberResponseDTO.toMemberResultDTO>> signUp(@RequestBody @Valid MemberRequestDTO.SignUpDTO request){
         MemberResponseDTO.toMemberResultDTO result = memberService.signUpMember(request);
-        return new ResponseEntity<>(ApiResponse.created(result),HttpStatus.CREATED);
+        return new ResponseEntity<>(CommonResponse.created(result),HttpStatus.CREATED);
     }
 
     @PostMapping("/email")
     @Operation(summary = "이메일 인증번호 전송 API")
-    public ResponseEntity<ApiResponse<?>> emailRequest(@RequestBody @Valid MemberRequestDTO.EmailDTO request){
+    public ResponseEntity<CommonResponse<?>> emailRequest(@RequestBody @Valid MemberRequestDTO.EmailDTO request){
         memberService.sendEmail(request);
-        return ResponseEntity.ok().body(ApiResponse.onSuccess(null));
+        return ResponseEntity.ok().body(CommonResponse.onSuccess(null));
     }
 
     @PostMapping("/password")
     @Operation(summary = "비밀번호 찾기 API")
-    public ResponseEntity<ApiResponse<MemberResponseDTO.toMemberResultDTO>> findPassword(@RequestBody @Valid MemberRequestDTO.PasswdDTO request){
-        return ResponseEntity.ok().body(ApiResponse.onSuccess(memberService.findPw(request)));
+    public ResponseEntity<CommonResponse<MemberResponseDTO.toMemberResultDTO>> findPassword(@RequestBody @Valid MemberRequestDTO.PasswdDTO request){
+        return ResponseEntity.ok().body(CommonResponse.onSuccess(memberService.findPw(request)));
     }
 
     @PostMapping("/password/reset")
     @Operation(summary = "비밀번호 재설정 API")
-    public ResponseEntity<ApiResponse<MemberResponseDTO.toMemberResultDTO>> setPassword(@RequestBody @Valid MemberRequestDTO.ResetPwDTO request){
-        return ResponseEntity.ok().body(ApiResponse.onSuccess(memberService.resetPw(request)));
+    public ResponseEntity<CommonResponse<MemberResponseDTO.toMemberResultDTO>> setPassword(@RequestBody @Valid MemberRequestDTO.ResetPwDTO request){
+        return ResponseEntity.ok().body(CommonResponse.onSuccess(memberService.resetPw(request)));
     }
 
 }

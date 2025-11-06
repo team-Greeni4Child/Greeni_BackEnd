@@ -1,7 +1,8 @@
 package com.greeni.api.members.service;
 
 import com.greeni.api.apiPayload.exception.GeneralException;
-import com.greeni.api.apiPayload.status.ErrorStatus;
+import com.greeni.api.apiPayload.status.CommonErrorStatus;
+import com.greeni.api.apiPayload.status.MemberErrorStatus;
 import com.greeni.api.members.converter.MemberConverter;
 import com.greeni.api.members.domain.Member;
 import com.greeni.api.members.dto.MemberRequestDTO;
@@ -11,7 +12,6 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,7 +22,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -39,7 +38,7 @@ public class MemberService {
     public MemberResponseDTO.toMemberResultDTO signUpMember(MemberRequestDTO.SignUpDTO request) {
         // 해당 메일이 이미 존재하는 메일인지 확인
         if(memberRepository.existsByEmail(request.getEmail())){
-            throw new GeneralException(ErrorStatus.EXIST_EMAIL);
+            throw new GeneralException(MemberErrorStatus.EXIST_EMAIL);
         }
 
         // 이메일 인증 완료 여부 확인
@@ -64,10 +63,10 @@ public class MemberService {
         ValueOperations<String, Object> ops = redistemplate.opsForValue();
         String codeNum = (String) ops.get("EmailCode"+email);
         if(codeNum == null){
-            throw new GeneralException(ErrorStatus.EXPIRED_CODE);
+            throw new GeneralException(MemberErrorStatus.EXPIRED_CODE);
         }
         if(!codeNum.equals(code)){
-            throw new GeneralException(ErrorStatus.WRONG_CODE);
+            throw new GeneralException(MemberErrorStatus.WRONG_CODE);
         }
     }
 
@@ -112,7 +111,7 @@ public class MemberService {
             javaMailSender.send(message);
         } catch(MessagingException | UnsupportedEncodingException e){
             log.error("Error Sending email", e);
-            throw new GeneralException(ErrorStatus.NOT_SEND_EMAIL_CODE);
+            throw new GeneralException(MemberErrorStatus.NOT_SEND_EMAIL_CODE);
         }
 
         // redis에 인증번호 3분간 저장
@@ -137,7 +136,7 @@ public class MemberService {
         ValueOperations<String, Object> ops = redistemplate.opsForValue();
         String state = (String) ops.get("chPw" + request.getEmail());
         if(state == null){
-            throw new GeneralException(ErrorStatus.GO_TO_FINDPW);
+            throw new GeneralException(MemberErrorStatus.GO_TO_FINDPW);
         }
         // 새 비밀번호 암호화해서 저장하기
         member.encodePassword(bCryptPasswordEncoder.encode(request.getPassword()));
@@ -146,6 +145,6 @@ public class MemberService {
     }
 
     public Member findMemberByEmail(String email) {
-        return memberRepository.findByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus.NOT_EXIST_EMAIL));
+        return memberRepository.findByEmail(email).orElseThrow(() -> new GeneralException(MemberErrorStatus.NOT_EXIST_EMAIL));
     }
 }
