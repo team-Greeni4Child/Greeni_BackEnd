@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -39,7 +40,7 @@ public class SecurityConfig {
 	private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
 	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
+	public PasswordEncoder PasswordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
@@ -48,7 +49,7 @@ public class SecurityConfig {
 		http.csrf(AbstractHttpConfigurer::disable)
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/api/members/signup", "/api/members/email", "/api/members/password",
-					"/api/members/password/reset").permitAll()
+					"/api/members/password/reset", "/api/auth/login").permitAll()
 				.requestMatchers(AUTH_WHITELIST).permitAll()
 				.anyRequest().authenticated())
 			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
