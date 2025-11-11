@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.greeni.api.apiPayload.exception.GeneralException;
 import com.greeni.api.apiPayload.status.JwtErrorStatus;
 import com.greeni.api.apiPayload.status.MemberErrorStatus;
+import com.greeni.api.members.domain.Member;
 import com.greeni.api.members.repository.MemberRepository;
 import com.greeni.api.security.auth.converter.AuthConverter;
 import com.greeni.api.security.auth.dto.AuthRequestDTO;
@@ -22,6 +23,7 @@ import com.greeni.api.security.jwt.redis.TokenManager;
 import com.greeni.api.security.jwt.token.CustomAuthenticationToken;
 import com.greeni.api.security.jwt.userDetails.CustomUserDetails;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -108,5 +110,20 @@ public class AuthServiceImpl implements AuthService {
 		Authentication auth = new CustomAuthenticationToken(userDetails, null);
 
 		return generateAuthResponse(auth, response);
+	}
+
+	@Override
+	public Member logout(HttpServletRequest request) {
+
+		String accessToken = jwtProvider.resolveToken(request);
+		String email = jwtProvider.getSubject(accessToken);
+
+		tokenManager.saveToken(RedisTokenType.LOGOUT_ACCESS_TOKEN, email, accessToken);
+		if (tokenManager.findToken(RedisTokenType.REFRESH_TOKEN, email)) {
+			tokenManager.removeToken(RedisTokenType.REFRESH_TOKEN, email);
+		}
+
+		return memberRepository.findByEmail(email)
+			.orElseThrow(() -> new GeneralException(MemberErrorStatus.NOT_EXIST_EMAIL));
 	}
 }

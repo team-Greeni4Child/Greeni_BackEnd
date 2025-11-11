@@ -13,6 +13,7 @@ import com.greeni.api.security.auth.dto.AuthRequestDTO;
 import com.greeni.api.security.auth.dto.AuthResponseDTO;
 import com.greeni.api.security.auth.service.AuthService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,5 +39,11 @@ public class AuthController implements AuthControllerDocs {
 		@RequestHeader(name = "Refresh-Token") String refreshToken, HttpServletResponse response) {
 		AuthResponseDTO.LoginResult result = authService.reissue(refreshToken, response);
 		return ResponseEntity.ok().body(CommonResponse.onSuccess(result));
+	}
+
+	@PostMapping("/logout")
+	public ResponseEntity<CommonResponse<Object>> logout(HttpServletRequest request) {
+		authService.logout(request);
+		return ResponseEntity.ok().body(CommonResponse.onSuccess(null));
 	}
 }
