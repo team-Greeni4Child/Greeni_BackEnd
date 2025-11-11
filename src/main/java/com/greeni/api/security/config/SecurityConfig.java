@@ -59,7 +59,7 @@ public class SecurityConfig {
 				.accessDeniedHandler(jwtAccessDeniedHandler))
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.sessionManagement(session -> session
-				.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.formLogin(AbstractHttpConfigurer::disable)   // 로그인 폼 비활성화
 			.httpBasic(AbstractHttpConfigurer::disable);  // 기본 인증 팝업 비활성화
 
