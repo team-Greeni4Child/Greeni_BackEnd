@@ -24,7 +24,7 @@ public interface AuthControllerDocs {
 		summary = "로그인 API",
 		description = "사용자의 이메일과 비밀번호로 로그인을 진행하는 API",
 		responses = {
-			@ApiResponse(responseCode = "COMMON200", description = "성공입니다.",
+			@ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다..",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponseDTO.LoginResult.class))),
 			@ApiResponse(responseCode = "MEMBER4004", description = "존재하지 않는 메일입니다"),
 			@ApiResponse(responseCode = "MEMBER4007", description = "비밀번호가 일치하지 않습니다")
@@ -37,7 +37,7 @@ public interface AuthControllerDocs {
 		summary = "JWT 재발급 API",
 		description = "Refresh Token을 입력받아, Access Token과 Refresh Token을 재발급 하는 API",
 		responses = {
-			@ApiResponse(responseCode = "COMMON200", description = "성공입니다.",
+			@ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다..",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponseDTO.LoginResult.class))),
 			@ApiResponse(responseCode = "MEMBER4004", description = "존재하지 않는 메일입니다")
 		}
@@ -49,7 +49,7 @@ public interface AuthControllerDocs {
 		summary = "로그아웃 API",
 		description = "사용자의 액세스 토큰과 리프레시 토큰을 블랙리스트화하는 API",
 		responses = {
-			@ApiResponse(responseCode = "COMMON200", description = "성공입니다."),
+			@ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다.."),
 			@ApiResponse(responseCode = "MEMBER4001", description = "존재하지 않는 메일입니다")
 		}
 	)
@@ -59,7 +59,7 @@ public interface AuthControllerDocs {
 		summary = "회원탈퇴 API",
 		description = "사용자의 액세스 토큰과 리프레시 토큰을 블랙리스트화하고, 사용자를 삭제하는 API",
 		responses = {
-			@ApiResponse(responseCode = "COMMON200", description = "성공입니다."),
+			@ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다.."),
 			@ApiResponse(responseCode = "MEMBER4001", description = "존재하지 않는 메일입니다")
 		}
 	)
