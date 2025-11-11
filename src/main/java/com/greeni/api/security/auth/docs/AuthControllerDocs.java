@@ -39,8 +39,7 @@ public interface AuthControllerDocs {
 		responses = {
 			@ApiResponse(responseCode = "COMMON200", description = "성공입니다.",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponseDTO.LoginResult.class))),
-			@ApiResponse(responseCode = "MEMBER4004", description = "존재하지 않는 메일입니다"),
-			@ApiResponse(responseCode = "MEMBER4007", description = "비밀번호가 일치하지 않습니다")
+			@ApiResponse(responseCode = "MEMBER4004", description = "존재하지 않는 메일입니다")
 		}
 	)
 	ResponseEntity<CommonResponse<AuthResponseDTO.LoginResult>> reissue(
@@ -51,8 +50,18 @@ public interface AuthControllerDocs {
 		description = "사용자의 액세스 토큰과 리프레시 토큰을 블랙리스트화하는 API",
 		responses = {
 			@ApiResponse(responseCode = "COMMON200", description = "성공입니다."),
-			@ApiResponse(responseCode = "MEMBER4001", description = "해당 이메일 사용자가 존재하지 않습니다.")
+			@ApiResponse(responseCode = "MEMBER4001", description = "존재하지 않는 메일입니다")
 		}
 	)
 	ResponseEntity<CommonResponse<Object>> logout(HttpServletRequest request);
+
+	@Operation(
+		summary = "회원탈퇴 API",
+		description = "사용자의 액세스 토큰과 리프레시 토큰을 블랙리스트화하고, 사용자를 삭제하는 API",
+		responses = {
+			@ApiResponse(responseCode = "COMMON200", description = "성공입니다."),
+			@ApiResponse(responseCode = "MEMBER4001", description = "존재하지 않는 메일입니다")
+		}
+	)
+	ResponseEntity<CommonResponse<Object>> deleteMember(HttpServletRequest request);
 }

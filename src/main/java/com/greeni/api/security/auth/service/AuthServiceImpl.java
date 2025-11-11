@@ -126,4 +126,11 @@ public class AuthServiceImpl implements AuthService {
 		return memberRepository.findByEmail(email)
 			.orElseThrow(() -> new GeneralException(MemberErrorStatus.NOT_EXIST_EMAIL));
 	}
+
+	@Override
+	public void deleteMember(HttpServletRequest request) {
+
+		Member member = logout(request);
+		memberRepository.deleteById(member.getId());
+	}
 }

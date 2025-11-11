@@ -1,6 +1,7 @@
 package com.greeni.api.security.auth.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -44,6 +45,12 @@ public class AuthController implements AuthControllerDocs {
 	@PostMapping("/logout")
 	public ResponseEntity<CommonResponse<Object>> logout(HttpServletRequest request) {
 		authService.logout(request);
+		return ResponseEntity.ok().body(CommonResponse.onSuccess(null));
+	}
+
+	@DeleteMapping("/me")
+	public ResponseEntity<CommonResponse<Object>> deleteMember(HttpServletRequest request) {
+		authService.deleteMember(request);
 		return ResponseEntity.ok().body(CommonResponse.onSuccess(null));
 	}
 }

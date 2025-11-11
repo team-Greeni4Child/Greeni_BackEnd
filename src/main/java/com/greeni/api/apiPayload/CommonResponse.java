@@ -24,9 +24,9 @@ public class CommonResponse<T> {
 	private final T result;
 	private LocalDateTime timestamp;
 
-	// 요청 성공 - 201 OK
+	// 요청 성공 - 200 OK
 	public static <T> CommonResponse<T> onSuccess(T result) {
-		return new CommonResponse<>(true, SuccessStatus._OK.getCode(), SuccessStatus._OK.getCode(), result,
+		return new CommonResponse<>(true, SuccessStatus._OK.getCode(), SuccessStatus._OK.getMessage(), result,
 			LocalDateTime.now());
 	}
 

@@ -13,4 +13,6 @@ public interface AuthService {
 	AuthResponseDTO.LoginResult reissue(String refreshToken, HttpServletResponse response);
 
 	Member logout(HttpServletRequest request);
+
+	void deleteMember(HttpServletRequest request);
 }
