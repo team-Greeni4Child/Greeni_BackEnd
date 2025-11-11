@@ -7,4 +7,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public interface AuthService {
 	AuthResponseDTO.LoginResult login(AuthRequestDTO.Login loginRequest, HttpServletResponse response);
+
+	AuthResponseDTO.LoginResult reissue(String refreshToken, HttpServletResponse response);
 }

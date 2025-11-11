@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.greeni.api.apiPayload.exception.GeneralException;
+import com.greeni.api.apiPayload.status.JwtErrorStatus;
 import com.greeni.api.apiPayload.status.MemberErrorStatus;
 import com.greeni.api.members.repository.MemberRepository;
 import com.greeni.api.security.auth.converter.AuthConverter;
@@ -78,6 +79,33 @@ public class AuthServiceImpl implements AuthService {
 
 		Authentication auth = new CustomAuthenticationToken(userDetails, null);
 		SecurityContextHolder.getContext().setAuthentication(auth);
+
+		return generateAuthResponse(auth, response);
+	}
+
+	@Override
+	public AuthResponseDTO.LoginResult reissue(String refreshToken, HttpServletResponse response) {
+
+		String email = jwtProvider.getSubject(refreshToken);
+
+		if (refreshToken == null || refreshToken.isEmpty() || !tokenManager.findToken(RedisTokenType.REFRESH_TOKEN,
+			email)) {
+			throw new GeneralException(JwtErrorStatus.REFRESH_TOKEN_NOT_FOUND);
+		}
+
+		UserDetails userDetails;
+
+		try {
+			userDetails = userDetailsService.loadUserByUsername(email);
+		} catch (UsernameNotFoundException e) {
+			log.debug("사용자 확인 불가: {}", e.getMessage());
+			throw new GeneralException(MemberErrorStatus.NOT_EXIST_EMAIL);
+		} catch (Exception e) {
+			log.debug("토큰 재발급 중 에러 발생: {}", e.getMessage());
+			throw new GeneralException(JwtErrorStatus.LOGIN_UNKNOWN_ERROR);
+		}
+
+		Authentication auth = new CustomAuthenticationToken(userDetails, null);
 
 		return generateAuthResponse(auth, response);
 	}

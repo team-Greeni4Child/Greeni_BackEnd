@@ -49,7 +49,7 @@ public class SecurityConfig {
 		http.csrf(AbstractHttpConfigurer::disable)
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/api/members/signup", "/api/members/email", "/api/members/password",
-					"/api/members/password/reset", "/api/auth/login").permitAll()
+					"/api/members/password/reset", "/api/auth/login", "/api/auth/reissue").permitAll()
 				.requestMatchers(AUTH_WHITELIST).permitAll()
 				.anyRequest().authenticated())
 			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
