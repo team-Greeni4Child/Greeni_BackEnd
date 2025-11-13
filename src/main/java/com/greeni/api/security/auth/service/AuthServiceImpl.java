@@ -100,10 +100,10 @@ public class AuthServiceImpl implements AuthService {
 		try {
 			userDetails = userDetailsService.loadUserByUsername(email);
 		} catch (UsernameNotFoundException e) {
-			log.debug("사용자 확인 불가: {}", e.getMessage());
+			log.error("사용자 확인 불가: {}", e.getMessage());
 			throw new GeneralException(MemberErrorStatus.NOT_EXIST_EMAIL);
 		} catch (Exception e) {
-			log.debug("토큰 재발급 중 에러 발생: {}", e.getMessage());
+			log.error("토큰 재발급 중 에러 발생: {}", e.getMessage());
 			throw new GeneralException(JwtErrorStatus.LOGIN_UNKNOWN_ERROR);
 		}
 
