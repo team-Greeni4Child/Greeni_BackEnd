@@ -2,6 +2,7 @@ package com.greeni.api.members.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +13,7 @@ import com.greeni.api.members.docs.MemberControllerDocs;
 import com.greeni.api.members.dto.MemberRequestDTO;
 import com.greeni.api.members.dto.MemberResponseDTO;
 import com.greeni.api.members.service.MemberService;
+import com.greeni.api.security.jwt.userDetails.CustomUserDetails;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,4 +52,11 @@ public class MemberController implements MemberControllerDocs {
 		return ResponseEntity.ok().body(CommonResponse.onSuccess(memberService.resetPw(request)));
 	}
 
+	@PostMapping("/parent-password")
+	public ResponseEntity<CommonResponse<Object>> checkParentPassword(
+		@RequestBody @Valid MemberRequestDTO.ParentPasswordDTO parentPasswordRequest,
+		@AuthenticationPrincipal CustomUserDetails userDetails) {
+		memberService.checkParentPassword(parentPasswordRequest, userDetails);
+		return ResponseEntity.ok().body(CommonResponse.onSuccess(null));
+	}
 }

@@ -17,6 +17,7 @@ import com.greeni.api.members.domain.Member;
 import com.greeni.api.members.dto.MemberRequestDTO;
 import com.greeni.api.members.dto.MemberResponseDTO;
 import com.greeni.api.members.repository.MemberRepository;
+import com.greeni.api.security.jwt.userDetails.CustomUserDetails;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.mail.MessagingException;
@@ -154,5 +155,13 @@ public class MemberServiceImpl implements MemberService {
 	public Member findMemberByEmail(String email) {
 		return memberRepository.findByEmail(email)
 			.orElseThrow(() -> new GeneralException(MemberErrorStatus.NOT_EXIST_EMAIL));
+	}
+
+	@Override
+	public void checkParentPassword(MemberRequestDTO.ParentPasswordDTO parentPasswordRequest,
+		CustomUserDetails userDetails) {
+		if (!passwordEncoder.matches(parentPasswordRequest.getPassword(), userDetails.getPassword())) {
+			throw new GeneralException(MemberErrorStatus.PASSWORD_NOT_MATCH);
+		}
 	}
 }

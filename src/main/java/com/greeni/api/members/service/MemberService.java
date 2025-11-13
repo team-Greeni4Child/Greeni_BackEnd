@@ -3,6 +3,7 @@ package com.greeni.api.members.service;
 import com.greeni.api.members.domain.Member;
 import com.greeni.api.members.dto.MemberRequestDTO;
 import com.greeni.api.members.dto.MemberResponseDTO;
+import com.greeni.api.security.jwt.userDetails.CustomUserDetails;
 
 public interface MemberService {
 
@@ -17,4 +18,6 @@ public interface MemberService {
 	MemberResponseDTO.toMemberResultDTO resetPw(MemberRequestDTO.ResetPwDTO request);
 
 	Member findMemberByEmail(String email);
+
+	void checkParentPassword(MemberRequestDTO.ParentPasswordDTO parentPasswordRequest, CustomUserDetails userDetails);
 }
