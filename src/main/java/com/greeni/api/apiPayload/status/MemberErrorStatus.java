@@ -14,7 +14,8 @@ public enum MemberErrorStatus implements ErrorReason {
 	WRONG_CODE(HttpStatus.BAD_REQUEST, "MEMBER4003", "이메일 인증코드가 올바르지 않습니다"),
 	NOT_EXIST_EMAIL(HttpStatus.BAD_REQUEST, "MEMBER4004", "존재하지 않는 메일입니다"),
 	GO_TO_FINDPW(HttpStatus.BAD_REQUEST, "MEMBER4005", "비밀번호 찾기를 다시 하고 오세요"),
-	NOT_SEND_EMAIL_CODE(HttpStatus.BAD_REQUEST, "MEMBER4004", "이메일 인증코드 전송에 실패했습니다"),
+	NOT_SEND_EMAIL_CODE(HttpStatus.BAD_REQUEST, "MEMBER4006", "이메일 인증코드 전송에 실패했습니다"),
+	PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "MEMBER4007", "비밀번호가 일치하지 않습니다"),
 	;
 
 	private final HttpStatus httpStatus;

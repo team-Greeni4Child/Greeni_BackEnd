@@ -1,4 +1,4 @@
-package com.greeni.api.common;
+package com.greeni.api.common.base;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;

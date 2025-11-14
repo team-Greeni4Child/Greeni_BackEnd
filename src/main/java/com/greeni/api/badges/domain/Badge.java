@@ -1,6 +1,6 @@
 package com.greeni.api.badges.domain;
 
-import com.greeni.api.common.BaseEntity;
+import com.greeni.api.common.base.BaseEntity;
 import com.greeni.api.profiles.domain.mapping.ProfileBadge;
 import jakarta.persistence.*;
 import lombok.*;

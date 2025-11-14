@@ -1,7 +1,7 @@
 package com.greeni.api.activities.domain;
 
 import com.greeni.api.activities.enums.ActivityType;
-import com.greeni.api.common.BaseEntity;
+import com.greeni.api.common.base.BaseEntity;
 import com.greeni.api.profiles.domain.Profile;
 import jakarta.persistence.*;
 import lombok.*;
