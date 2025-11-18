@@ -73,6 +73,7 @@ public class MemberServiceImpl implements MemberService {
 		if (!codeNum.equals(code)) {
 			throw new GeneralException(MemberErrorStatus.WRONG_CODE);
 		}
+		redistemplate.delete("EmailCode" + email);
 	}
 
 	// 이메일 인증 번호 전송
