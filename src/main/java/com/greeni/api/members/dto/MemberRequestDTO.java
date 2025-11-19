@@ -24,8 +24,8 @@ public class MemberRequestDTO {
 
 		@NotBlank(message = "비밀번호는 필수 입력입니다.")
 		@Pattern(
-			regexp = "^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,15}$",
-			message = "비밀번호는 8~15자이며, 영문자, 숫자, 특수문자를 모두 포함해야 합니다."
+				regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!-/:-@\\[-`\\{-~]).{8,}$",
+				message = "비밀번호는 8자 이상이며, 영문자, 숫자, 특수문자를 모두 포함해야 합니다."
 		)
 		@Schema(description = "재설정할 비밀번호", example = "1234@@sdqq")
 		private String password;
@@ -82,8 +82,8 @@ public class MemberRequestDTO {
 
 		@NotBlank(message = "비밀번호는 필수 입력입니다.")
 		@Pattern(
-			regexp = "^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,15}$",
-			message = "비밀번호는 8~15자이며, 영문자, 숫자, 특수문자를 모두 포함해야 합니다."
+				regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!-/:-@\\[-`\\{-~]).{8,}$",
+				message = "비밀번호는 8자 이상이며, 영문자, 숫자, 특수문자를 모두 포함해야 합니다."
 		)
 		@Schema(description = "재설정할 비밀번호", example = "1234@@sdqq")
 		private String password;
