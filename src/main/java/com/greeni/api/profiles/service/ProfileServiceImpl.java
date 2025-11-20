@@ -1,5 +1,9 @@
 package com.greeni.api.profiles.service;
 
+import com.greeni.api.apiPayload.exception.GeneralException;
+import com.greeni.api.apiPayload.status.MemberErrorStatus;
+import com.greeni.api.members.domain.Member;
+import com.greeni.api.members.repository.MemberRepository;
 import com.greeni.api.profiles.converter.ProfileConverter;
 import com.greeni.api.profiles.domain.Profile;
 import com.greeni.api.profiles.dto.ProfileRequestDTO;
@@ -18,13 +22,16 @@ import lombok.extern.slf4j.Slf4j;
 public class ProfileServiceImpl implements ProfileService {
 
     private final ProfileRepository profileRepository;
+    private final MemberRepository memberRepository;
 
     // 프로필 생성
     @Override
     @Transactional
-    public ProfileResponseDTO.CreateProfileResponse createProfile(ProfileRequestDTO.CreateProfileRequest dto) {
-        // Profile 엔티티 생성
-        Profile profile = ProfileConverter.toProfile(dto);
+    public ProfileResponseDTO.CreateProfileResponse createProfile(Long memberId, ProfileRequestDTO.CreateProfileRequest dto) {
+        // Member, Profile 엔티티 생성
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralException(MemberErrorStatus.NOT_EXIST_MEMBER));
+        Profile profile = ProfileConverter.toProfile(member, dto);
 
         // 저장
         Profile saved = profileRepository.save(profile);

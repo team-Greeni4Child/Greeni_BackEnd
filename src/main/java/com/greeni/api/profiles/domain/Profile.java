@@ -7,6 +7,7 @@ import com.greeni.api.members.domain.Member;
 import com.greeni.api.profiles.domain.mapping.ProfileBadge;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -37,7 +38,7 @@ public class Profile extends BaseEntity {
     private LocalDate birth;
 
     @Column(nullable = false)
-    private Integer attendance;
+    private int attendance;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

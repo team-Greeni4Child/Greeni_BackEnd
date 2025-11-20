@@ -4,9 +4,11 @@ import com.greeni.api.apiPayload.CommonResponse;
 import com.greeni.api.profiles.dto.ProfileRequestDTO;
 import com.greeni.api.profiles.dto.ProfileResponseDTO;
 import com.greeni.api.profiles.service.ProfileService;
+import com.greeni.api.security.jwt.userDetails.CustomUserDetails;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import com.greeni.api.profiles.docs.ProfileControllerDocs;
@@ -25,9 +27,10 @@ public class ProfileController implements ProfileControllerDocs {
     // 프로필 생성
     @PostMapping
     public ResponseEntity<CommonResponse<ProfileResponseDTO.CreateProfileResponse>> addProfile(
-            @RequestBody @Valid ProfileRequestDTO.CreateProfileRequest dto
+            @RequestBody @Valid ProfileRequestDTO.CreateProfileRequest dto,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
-        ProfileResponseDTO.CreateProfileResponse result = profileService.createProfile(dto);
+        ProfileResponseDTO.CreateProfileResponse result = profileService.createProfile(customUserDetails.getId(), dto);
         return new ResponseEntity<>(CommonResponse.created(result), HttpStatus.CREATED);
     }
 }
