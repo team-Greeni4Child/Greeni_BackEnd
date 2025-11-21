@@ -45,5 +45,6 @@ jobs:
           script: |
             pkill -f 'java -jar .*Greeni_BackEnd' || true
             cd ~/Greeni_BackEnd
-            java -jar *.jar --spring.profiles.active=dev > app.log 2>&1
+            nohup java -jar *.jar --spring.profiles.active=dev > app.log 2>&1 &
+            disown
             
