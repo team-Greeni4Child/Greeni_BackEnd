@@ -69,4 +69,10 @@ public class Profile extends BaseEntity {
             member.getProfileList().add(this);
         }
     }
+
+    // 프로필 수정 편의 메서드
+    public void update(String name, LocalDate birth) {
+        this.name = name;
+        this.birth = birth;
+    }
 }

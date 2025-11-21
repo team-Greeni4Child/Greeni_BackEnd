@@ -33,4 +33,15 @@ public class ProfileController implements ProfileControllerDocs {
         ProfileResponseDTO.CreateProfileResponse result = profileService.createProfile(customUserDetails.getId(), dto);
         return new ResponseEntity<>(CommonResponse.created(result), HttpStatus.CREATED);
     }
+
+    // 프로필 수정
+    @PatchMapping("/{profileId}")
+    public ResponseEntity<CommonResponse<ProfileResponseDTO.UpdateProfileResponse>> changeProfile(
+            @PathVariable Long profileId,
+            @RequestBody @Valid ProfileRequestDTO.UpdateProfileRequest dto,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        ProfileResponseDTO.UpdateProfileResponse result = profileService.updateProfile(customUserDetails.getId(), profileId, dto);
+        return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
+    }
 }
