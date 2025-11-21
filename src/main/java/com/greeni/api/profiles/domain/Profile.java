@@ -7,6 +7,7 @@ import com.greeni.api.members.domain.Member;
 import com.greeni.api.profiles.domain.mapping.ProfileBadge;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -37,7 +38,7 @@ public class Profile extends BaseEntity {
     private LocalDate birth;
 
     @Column(nullable = false)
-    private Integer attendance;
+    private int attendance;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -54,4 +55,18 @@ public class Profile extends BaseEntity {
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL)
     @Builder.Default
     private List<ProfileBadge> profileBadgeList = new ArrayList<>();
+
+    // 연관관계 편의 메서드
+    public void setMember(Member member) {
+        // 1. 기존 연관관계 제거
+        if (this.member != null) {
+            this.member.getProfileList().remove(this);
+        }
+        // 2. 새로운 member로 설정
+        this.member = member;
+        // 3. 새 member의 profileList에 this 추가
+        if (member != null && !member.getProfileList().contains(this)) {
+            member.getProfileList().add(this);
+        }
+    }
 }
