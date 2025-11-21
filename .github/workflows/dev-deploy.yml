@@ -42,9 +42,9 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
+          background: true
           script: |
             pkill -f 'java -jar .*Greeni_BackEnd' || true
             cd ~/Greeni_BackEnd
-            nohup java -jar *.jar --spring.profiles.active=dev > app.log 2>&1 &
-            disown
+            java -jar *.jar --spring.profiles.active=dev > app.log 2>&1
             
