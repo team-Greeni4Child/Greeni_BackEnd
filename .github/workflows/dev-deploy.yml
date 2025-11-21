@@ -44,4 +44,4 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             pkill -f 'java -jar' || true
-            nohup java -jar /Greeni_BackEnd/*.jar --spring.profiles.active=dev > app.log 2>&1 &
+            nohup java -jar ~/Greeni_BackEnd/*.jar --spring.profiles.active=dev > app.log 2>&1 &
