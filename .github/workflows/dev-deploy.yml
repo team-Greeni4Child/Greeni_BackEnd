@@ -27,30 +27,27 @@ jobs:
       - name: build with gradle
         run: ./gradlew clean build --exclude-task test
 
-      - name: change build file
-        run: mv ./build/libs/*SNAPSHOT.jar ./project.jar
-
-      - name: deploy to server
-        uses: appleboy/scp-action@v0.1.7
+      - name: login to DockerHub
+        uses: docker/login-action@v3
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          source: project.jar
-          target: ~/Greeni_BackEnd/tobe
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: run on server
+      - name: build & push docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/greeni:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/greeni:latest
+
+      - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            rm -rf ~/Greeni_BackEnd/current
-            mkdir ~/Greeni_BackEnd/current
-            mv ~/Greeni_BackEnd/tobe/project.jar ~/Greeni_BackEnd/current/project.jar
-            cd ~/Greeni_BackEnd/current
-            sudo fuser -k -n tcp 8080 || true
-            nohup java -jar project.jar > ./output.log 2>&1 &
-            rm -rf ~/Greeni_BackEnd/tobe
-            
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/greeni:latest
+            sudo docker stop greeni || true
+            sudo docker rm greeni || true
+            sudo docker run -d --name greeni -p 8080:8080 \
+              ${{ secrets.DOCKER_USERNAME }}/greeni:latest
+            sudo docker image prune -f
