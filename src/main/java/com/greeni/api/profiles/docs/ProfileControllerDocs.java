@@ -5,6 +5,7 @@ import com.greeni.api.profiles.dto.ProfileRequestDTO;
 import com.greeni.api.profiles.dto.ProfileResponseDTO;
 import com.greeni.api.security.jwt.userDetails.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -39,6 +40,7 @@ public interface ProfileControllerDocs {
                     @ApiResponse(responseCode = "PROFILE4041", description = "존재하지 않는 프로필입니다.")
             })
     ResponseEntity<CommonResponse<ProfileResponseDTO.UpdateProfileResponse>> changeProfile(
+            @Parameter(description = "수정할 프로필의 ID", required = true)
             @PathVariable Long profileId,
             @RequestBody @Valid ProfileRequestDTO.UpdateProfileRequest dto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
