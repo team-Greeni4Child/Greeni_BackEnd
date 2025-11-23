@@ -2,6 +2,7 @@ package com.greeni.api.profiles.service;
 
 import com.greeni.api.apiPayload.exception.GeneralException;
 import com.greeni.api.apiPayload.status.MemberErrorStatus;
+import com.greeni.api.apiPayload.status.ProfileErrorStatus;
 import com.greeni.api.members.domain.Member;
 import com.greeni.api.members.repository.MemberRepository;
 import com.greeni.api.profiles.converter.ProfileConverter;
@@ -14,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.time.LocalDate;
 
 @Service
 @Slf4j
@@ -38,5 +41,25 @@ public class ProfileServiceImpl implements ProfileService {
 
         // DTO 변환 후 반환
         return ProfileConverter.toCreateProfileResponseDTO(saved);
+    }
+
+    // 프로필 수정
+    @Override
+    @Transactional
+    public ProfileResponseDTO.UpdateProfileResponse updateProfile(Long memberId, Long profileId, ProfileRequestDTO.UpdateProfileRequest dto) {
+        // Profile 엔티티 조회
+        Profile profile = profileRepository.findById(profileId)
+                .orElseThrow(() -> new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND));
+
+        // 이 Profile이 현재 로그인한 회원의 것인지 검증
+        if (!profile.getMember().getId().equals(memberId)) {
+            throw new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND);
+        }
+
+        // 업데이트
+        profile.update(dto.name(), dto.birth());
+
+        // DTO 변환 후 반환
+        return ProfileConverter.toUpdateProfileResponseDTO(profile);
     }
 }

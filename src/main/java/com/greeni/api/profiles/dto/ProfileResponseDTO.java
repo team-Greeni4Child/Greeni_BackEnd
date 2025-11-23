@@ -16,4 +16,14 @@ public class ProfileResponseDTO {
             Long memberId,
             LocalDateTime createdAt
     ) {}
+
+    @Builder
+    public record UpdateProfileResponse (
+            Long profileId,
+            String profileImage,
+            String name,
+            LocalDate birth,
+            Long memberId,
+            LocalDateTime createdAt
+    ) {}
 }

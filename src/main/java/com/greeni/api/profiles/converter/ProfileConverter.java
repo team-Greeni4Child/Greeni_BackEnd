@@ -28,4 +28,16 @@ public class ProfileConverter {
                 .member(member)
                 .build();
     }
+
+    // entity -> 수정 응답 DTO
+    public static ProfileResponseDTO.UpdateProfileResponse toUpdateProfileResponseDTO(Profile profile) {
+        return ProfileResponseDTO.UpdateProfileResponse.builder()
+                .profileId(profile.getId())
+                .profileImage(profile.getProfileImage())
+                .name(profile.getName())
+                .birth(profile.getBirth())
+                .memberId(profile.getMember().getId())
+                .createdAt(profile.getUpdatedAt())
+                .build();
+    }
 }
