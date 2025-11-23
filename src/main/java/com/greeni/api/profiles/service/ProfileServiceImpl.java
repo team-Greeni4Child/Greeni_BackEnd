@@ -48,8 +48,13 @@ public class ProfileServiceImpl implements ProfileService {
     @Transactional
     public ProfileResponseDTO.UpdateProfileResponse updateProfile(Long memberId, Long profileId, ProfileRequestDTO.UpdateProfileRequest dto) {
         // Profile 엔티티 조회
-        Profile profile = profileRepository.findByIdAndMemberId(profileId, memberId)
+        Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND));
+
+        // 이 Profile이 현재 로그인한 회원의 것인지 검증
+        if (!profile.getMember().getId().equals(memberId)) {
+            throw new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND);
+        }
 
         // 업데이트
         profile.update(dto.name(), dto.birth());
