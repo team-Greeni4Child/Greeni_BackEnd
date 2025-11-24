@@ -44,4 +44,14 @@ public class ProfileController implements ProfileControllerDocs {
         ProfileResponseDTO.UpdateProfileResponse result = profileService.updateProfile(customUserDetails.getId(), profileId, dto);
         return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
     }
+
+    // 프로필 삭제
+    @DeleteMapping("/{profileId}")
+    public ResponseEntity<CommonResponse<Void>> removeProfile(
+            @PathVariable Long profileId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        profileService.deleteProfile(customUserDetails.getId(), profileId);
+        return new ResponseEntity<>(CommonResponse.onSuccess(null), HttpStatus.OK);
+    }
 }

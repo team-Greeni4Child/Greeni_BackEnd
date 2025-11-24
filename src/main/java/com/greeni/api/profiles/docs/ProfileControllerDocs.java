@@ -45,4 +45,17 @@ public interface ProfileControllerDocs {
             @RequestBody @Valid ProfileRequestDTO.UpdateProfileRequest dto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     );
+
+    @Operation(summary = "프로필 삭제 API",
+            description = "사용자의 프로필을 삭제하는 API",
+            responses = {
+                    @ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다.",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommonResponse.class))),
+                    @ApiResponse(responseCode = "PROFILE4041", description = "존재하지 않는 프로필입니다.")
+            })
+    ResponseEntity<CommonResponse<Void>> removeProfile(
+            @Parameter(description = "삭제할 프로필의 ID", required = true)
+            @PathVariable Long profileId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    );
 }

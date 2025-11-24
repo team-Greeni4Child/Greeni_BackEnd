@@ -16,8 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDate;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -61,5 +59,22 @@ public class ProfileServiceImpl implements ProfileService {
 
         // DTO 변환 후 반환
         return ProfileConverter.toUpdateProfileResponseDTO(profile);
+    }
+
+    // 프로필 삭제
+    @Override
+    @Transactional
+    public void deleteProfile(Long memberId, Long profileId) {
+        // Profile 엔티티 조회
+        Profile profile = profileRepository.findById(profileId)
+                .orElseThrow(() -> new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND));
+
+        // 본인 Profile인지 검증
+        if (!profile.getMember().getId().equals(memberId)) {
+            throw new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND);
+        }
+
+        // 삭제
+        profileRepository.delete(profile);
     }
 }
