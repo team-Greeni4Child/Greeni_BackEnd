@@ -54,4 +54,13 @@ public class ProfileController implements ProfileControllerDocs {
         profileService.deleteProfile(customUserDetails.getId(), profileId);
         return new ResponseEntity<>(CommonResponse.onSuccess(null), HttpStatus.OK);
     }
+
+    // 프로필 목록 조회
+    @GetMapping("/list")
+    public ResponseEntity<CommonResponse<ProfileResponseDTO.GetProfileListResponse>> findProfileList(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        ProfileResponseDTO.GetProfileListResponse result = profileService.getProfileList(customUserDetails.getId());
+        return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
+    }
 }

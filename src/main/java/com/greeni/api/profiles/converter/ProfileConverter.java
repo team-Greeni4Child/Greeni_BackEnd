@@ -5,6 +5,8 @@ import com.greeni.api.profiles.domain.Profile;
 import com.greeni.api.profiles.dto.ProfileRequestDTO;
 import com.greeni.api.profiles.dto.ProfileResponseDTO;
 
+import java.util.List;
+
 public class ProfileConverter {
 
     // entity -> DTO
@@ -38,6 +40,19 @@ public class ProfileConverter {
                 .birth(profile.getBirth())
                 .memberId(profile.getMember().getId())
                 .createdAt(profile.getUpdatedAt())
+                .build();
+    }
+
+    // entity list -> 목록 조회 응답 DTO
+    public static ProfileResponseDTO.GetProfileListResponse toGetProfileListResponseDTO(List<Profile> profiles) {
+        return ProfileResponseDTO.GetProfileListResponse.builder()
+                .profileLists(profiles.stream()
+                        .map(profile -> ProfileResponseDTO.ProfileList.builder()
+                                .profileId(profile.getId())
+                                .name(profile.getName())
+                                .profileImage(profile.getProfileImage())
+                                .build())
+                        .toList())
                 .build();
     }
 }

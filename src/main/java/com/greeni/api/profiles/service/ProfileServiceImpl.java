@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -76,5 +78,15 @@ public class ProfileServiceImpl implements ProfileService {
 
         // 삭제
         profileRepository.delete(profile);
+    }
+
+    // 프로필 목록 조회
+    @Override
+    public ProfileResponseDTO.GetProfileListResponse getProfileList(Long memberId) {
+        // Profile 리스트 조회
+        List<Profile> profiles = profileRepository.findAllByMemberId(memberId);
+
+        // DTO 변환 후 반환
+        return ProfileConverter.toGetProfileListResponseDTO(profiles);
     }
 }
