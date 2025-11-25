@@ -67,11 +67,11 @@ public class ProfileServiceImpl implements ProfileService {
     public void deleteProfile(Long memberId, Long profileId) {
         // Profile 엔티티 조회
         Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ProfileErrorStatus.UNAUTHORIZED_PROFILE_ACCESS));
 
         // 본인 Profile인지 검증
         if (!profile.getMember().getId().equals(memberId)) {
-            throw new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND);
+            throw new GeneralException(ProfileErrorStatus.UNAUTHORIZED_PROFILE_ACCESS);
         }
 
         // 삭제
