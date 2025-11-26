@@ -24,6 +24,7 @@ public interface ProfileControllerDocs {
             responses = {
                     @ApiResponse(responseCode = "COMMON201", description = "리소스를 생성했습니다.",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProfileResponseDTO.CreateProfileResponse.class))),
+                    @ApiResponse(responseCode = "PROFILE4002", description = "프로필은 최대 6개까지 생성할 수 있습니다."),
                     @ApiResponse(responseCode = "MEMBER4041", description = "존재하지 않는 회원입니다.")
 
             })
