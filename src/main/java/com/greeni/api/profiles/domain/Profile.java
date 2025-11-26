@@ -71,7 +71,8 @@ public class Profile extends BaseEntity {
     }
 
     // 프로필 수정 편의 메서드
-    public void update(String name, LocalDate birth) {
+    public void update(String profileImage, String name, LocalDate birth) {
+        this.profileImage = profileImage;
         this.name = name;
         this.birth = birth;
     }

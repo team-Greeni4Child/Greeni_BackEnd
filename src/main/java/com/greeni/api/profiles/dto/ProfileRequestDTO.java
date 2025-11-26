@@ -11,6 +11,7 @@ import java.time.LocalDate;
 public class ProfileRequestDTO {
 
     public record CreateProfileRequest(
+            @Schema(description = "프로필 이미지", example = "greeni.jpg")
             String profileImage,
 
             @NotBlank(message = "이름은 필수 입력입니다.")
@@ -25,6 +26,9 @@ public class ProfileRequestDTO {
     ) {}
 
     public record UpdateProfileRequest(
+            @Schema(description = "프로필 이미지", example = "greeni.jpg")
+            String profileImage,
+
             @NotBlank(message = "이름은 필수 입력입니다.")
             @Size(min = 1, max = 20, message = "이름은 1~20자 사이여야 합니다.")
             @Schema(description = "수정할 사용자 이름", example = "개굴개굴")

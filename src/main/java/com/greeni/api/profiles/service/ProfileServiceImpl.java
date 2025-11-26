@@ -63,7 +63,7 @@ public class ProfileServiceImpl implements ProfileService {
         }
 
         // 업데이트
-        profile.update(dto.name(), dto.birth());
+        profile.update(dto.profileImage(), dto.name(), dto.birth());
 
         // DTO 변환 후 반환
         return ProfileConverter.toUpdateProfileResponseDTO(profile);
