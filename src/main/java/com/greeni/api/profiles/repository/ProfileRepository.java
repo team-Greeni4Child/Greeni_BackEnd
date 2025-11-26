@@ -7,5 +7,7 @@ import java.util.List;
 
 public interface ProfileRepository extends JpaRepository<Profile, Long> {
 
+    int countByMemberId(Long memberId);
+
     List<Profile> findAllByMemberId(Long memberId);
 }

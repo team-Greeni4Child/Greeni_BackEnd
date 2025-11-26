@@ -31,6 +31,12 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     @Transactional
     public ProfileResponseDTO.CreateProfileResponse createProfile(Long memberId, ProfileRequestDTO.CreateProfileRequest dto) {
+        // 프로필 생성 가능 개수는 최대 6개
+        int count = profileRepository.countByMemberId(memberId);
+        if (count >= 6) {
+            throw new GeneralException(ProfileErrorStatus.PROFILE_LIMIT_EXCEEDED);
+        }
+
         // Member, Profile 엔티티 생성
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralException(MemberErrorStatus.NOT_EXIST_MEMBER));
