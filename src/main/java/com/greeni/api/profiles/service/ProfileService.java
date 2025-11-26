@@ -13,4 +13,7 @@ public interface ProfileService {
 
     // 프로필 삭제
     void deleteProfile(Long memberId, Long profileId);
+
+    // 프로필 목록 조회
+    ProfileResponseDTO.GetProfileListResponse getProfileList(Long memberId);
 }

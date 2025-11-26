@@ -4,6 +4,7 @@ import lombok.Builder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ProfileResponseDTO {
 
@@ -25,5 +26,17 @@ public class ProfileResponseDTO {
             LocalDate birth,
             Long memberId,
             LocalDateTime createdAt
+    ) {}
+
+    @Builder
+    public record GetProfileListResponse (
+            List<ProfileList> profileLists
+    ) {}
+
+    @Builder
+    public record ProfileList (
+            Long profileId,
+            String name,
+            String profileImage
     ) {}
 }
