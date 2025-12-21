@@ -8,8 +8,7 @@ public class BadgeResponseDTO {
 
     @Builder
     public record GetBadgeListResponse(
-            List<BadgeList> badgeLists,
-            boolean hasNext  // Slice에서 제공
+            List<BadgeList> badgeLists
     ) {}
 
     @Builder

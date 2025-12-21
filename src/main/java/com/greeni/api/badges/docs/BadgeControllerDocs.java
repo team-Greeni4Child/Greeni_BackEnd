@@ -9,10 +9,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,11 +21,12 @@ public interface BadgeControllerDocs {
             responses = {
                     @ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다.",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = BadgeResponseDTO.GetBadgeListResponse.class))),
+                    @ApiResponse(responseCode = "PROFILE4031", description = "해당 프로필에 접근할 권한이 없습니다."),
+                    @ApiResponse(responseCode = "PROFILE4041", description = "존재하지 않는 프로필입니다.")
             })
     ResponseEntity<CommonResponse<BadgeResponseDTO.GetBadgeListResponse>> findBadgeList(
             @Parameter(description = "조회할 프로필 ID", required = true)
             @RequestParam Long profileId,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
     );
 }

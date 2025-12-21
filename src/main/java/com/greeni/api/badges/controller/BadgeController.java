@@ -4,10 +4,6 @@ import com.greeni.api.apiPayload.CommonResponse;
 import com.greeni.api.badges.dto.BadgeResponseDTO;
 import com.greeni.api.badges.service.BadgeService;
 import com.greeni.api.security.jwt.userDetails.CustomUserDetails;
-import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,10 +28,9 @@ public class BadgeController implements BadgeControllerDocs {
     @GetMapping("/list")
     public ResponseEntity<CommonResponse<BadgeResponseDTO.GetBadgeListResponse>> findBadgeList(
             @RequestParam Long profileId,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
-        BadgeResponseDTO.GetBadgeListResponse result = badgeService.getBadgeList(customUserDetails.getId(), profileId, pageable);
+        BadgeResponseDTO.GetBadgeListResponse result = badgeService.getBadgeList(customUserDetails.getId(), profileId);
         return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
     }
 }
