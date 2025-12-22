@@ -12,7 +12,7 @@ public class BadgeConverter {
         return BadgeResponseDTO.GetBadgeListResponse.builder()
                 .badgeLists(badges.stream()
                         .map(badge -> BadgeResponseDTO.BadgeList.builder()
-                                .badgeId(badge.getId())
+                                .badgeId(badge.getBadge().getId())
                                 .name(badge.getBadge().getName())
                                 .description(badge.getBadge().getDescription())
                                 .build())
