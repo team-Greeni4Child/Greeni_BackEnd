@@ -7,7 +7,6 @@ import java.io.IOException;
 
 public interface S3Service {
 
-    String uploadImage(MultipartFile file) throws IOException;
+    S3ResponseDTO.GetS3UrlDTO upload(Long id, String file);
 
-    S3ResponseDTO.toS3UrlDTO upload(MultipartFile file);
 }
