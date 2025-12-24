@@ -1,9 +1,6 @@
 package com.greeni.api.s3.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 public class S3ResponseDTO {
 
@@ -11,7 +8,9 @@ public class S3ResponseDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class toS3UrlDTO {
+    @EqualsAndHashCode
+    public static class GetS3UrlDTO {
         String url;
+        String key;
     }
 }
