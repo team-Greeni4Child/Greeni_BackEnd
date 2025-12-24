@@ -6,12 +6,12 @@ import com.greeni.api.apiPayload.status.S3ErrorStauts;
 import com.greeni.api.s3.docs.S3ControllerDocs;
 import com.greeni.api.s3.dto.S3ResponseDTO;
 import com.greeni.api.s3.service.S3Service;
+import com.greeni.api.security.jwt.userDetails.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -22,9 +22,9 @@ public class S3Controller implements S3ControllerDocs {
 
     private final S3Service s3Service;
 
-    @PostMapping("")
-    public CommonResponse<S3ResponseDTO.toS3UrlDTO> uploadFile(@RequestParam("file") MultipartFile file){
-        return CommonResponse.onSuccess(s3Service.upload(file));
-
+    @GetMapping()
+    public CommonResponse<S3ResponseDTO.GetS3UrlDTO> uploadFile(@AuthenticationPrincipal CustomUserDetails customUserDetails, String file){
+        return CommonResponse.onSuccess(s3Service.upload(customUserDetails.getId(), file));
     }
+
 }
