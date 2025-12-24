@@ -59,7 +59,7 @@ public class ProfileServiceImpl implements ProfileService {
 
         // 이 Profile이 현재 로그인한 회원의 것인지 검증
         if (!profile.getMember().getId().equals(memberId)) {
-            throw new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND);
+            throw new GeneralException(ProfileErrorStatus.UNAUTHORIZED_PROFILE_ACCESS);
         }
 
         // 업데이트
@@ -75,7 +75,7 @@ public class ProfileServiceImpl implements ProfileService {
     public void deleteProfile(Long memberId, Long profileId) {
         // Profile 엔티티 조회
         Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new GeneralException(ProfileErrorStatus.UNAUTHORIZED_PROFILE_ACCESS));
+                .orElseThrow(() -> new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND));
 
         // 본인 Profile인지 검증
         if (!profile.getMember().getId().equals(memberId)) {
@@ -94,5 +94,21 @@ public class ProfileServiceImpl implements ProfileService {
 
         // DTO 변환 후 반환
         return ProfileConverter.toGetProfileListResponseDTO(profiles);
+    }
+
+    // 프로필 단일 조회
+    @Override
+    public ProfileResponseDTO.GetProfileResponse getProfile(Long memberId, Long profileId) {
+        // Profile 엔티티 조회
+        Profile profile = profileRepository.findById(profileId)
+                .orElseThrow(() -> new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND));
+
+        // 본인 Profile인지 검증
+        if (!profile.getMember().getId().equals(memberId)) {
+            throw new GeneralException(ProfileErrorStatus.UNAUTHORIZED_PROFILE_ACCESS);
+        }
+
+        // DTO 변환 후 반환
+        return ProfileConverter.toGetProfileResponseDTO(profile);
     }
 }

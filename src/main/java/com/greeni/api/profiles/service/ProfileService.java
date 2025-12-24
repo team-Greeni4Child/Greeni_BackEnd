@@ -16,4 +16,7 @@ public interface ProfileService {
 
     // 프로필 목록 조회
     ProfileResponseDTO.GetProfileListResponse getProfileList(Long memberId);
+
+    // 프로필 단일 조회
+    ProfileResponseDTO.GetProfileResponse getProfile(Long memberId, Long profileId);
 }
