@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ProfileConverter {
 
-    // entity -> DTO
+    // entity -> 생성 응답 DTO
     public static ProfileResponseDTO.CreateProfileResponse toCreateProfileResponseDTO(Profile profile) {
         return ProfileResponseDTO.CreateProfileResponse.builder()
                 .profileId(profile.getId())
@@ -53,6 +53,16 @@ public class ProfileConverter {
                                 .profileImage(profile.getProfileImage())
                                 .build())
                         .toList())
+                .build();
+    }
+
+    // entity -> 조회 응답 DTO
+    public static ProfileResponseDTO.GetProfileResponse toGetProfileResponseDTO(Profile profile) {
+        return ProfileResponseDTO.GetProfileResponse.builder()
+                .profileId(profile.getId())
+                .profileImage(profile.getProfileImage())
+                .name(profile.getName())
+                .birth(profile.getBirth())
                 .build();
     }
 }

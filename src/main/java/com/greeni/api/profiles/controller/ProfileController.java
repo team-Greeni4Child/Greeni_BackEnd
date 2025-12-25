@@ -63,4 +63,14 @@ public class ProfileController implements ProfileControllerDocs {
         ProfileResponseDTO.GetProfileListResponse result = profileService.getProfileList(customUserDetails.getId());
         return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
     }
+
+    // 프로필 단일 조회
+    @GetMapping("/{profileId}")
+    public ResponseEntity<CommonResponse<ProfileResponseDTO.GetProfileResponse>> findProfile(
+            @PathVariable Long profileId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        ProfileResponseDTO.GetProfileResponse result = profileService.getProfile(customUserDetails.getId(), profileId);
+        return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
+    }
 }

@@ -39,4 +39,12 @@ public class ProfileResponseDTO {
             String name,
             String profileImage
     ) {}
+
+    @Builder
+    public record GetProfileResponse (
+            Long profileId,
+            String profileImage,
+            String name,
+            LocalDate birth
+    ) {}
 }
