@@ -3,7 +3,7 @@ package com.greeni.api.diaries.domain;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import com.greeni.api.diaries.enums.VoiceRole;
+import com.greeni.api.diaries.domain.enums.VoiceRole;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

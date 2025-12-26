@@ -1,4 +1,4 @@
-package com.greeni.api.activities.docs;
+package com.greeni.api.activities.controller.docs;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 

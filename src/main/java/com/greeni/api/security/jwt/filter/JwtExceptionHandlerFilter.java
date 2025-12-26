@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.greeni.api.apiPayload.exception.GeneralException;
+import com.greeni.api.apiPayload.handler.GeneralException;
 import com.greeni.api.apiPayload.status.CommonErrorStatus;
 import com.greeni.api.apiPayload.status.MemberErrorStatus;
 import com.greeni.api.security.auth.service.AuthResponseWriter;

@@ -9,7 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.greeni.api.apiPayload.exception.GeneralException;
+import com.greeni.api.apiPayload.handler.GeneralException;
 import com.greeni.api.apiPayload.status.JwtErrorStatus;
 import com.greeni.api.apiPayload.status.MemberErrorStatus;
 import com.greeni.api.members.domain.Member;

@@ -3,7 +3,7 @@ package com.greeni.api.activities.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.greeni.api.activities.docs.ActivityControllerDocs;
+import com.greeni.api.activities.controller.docs.ActivityControllerDocs;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

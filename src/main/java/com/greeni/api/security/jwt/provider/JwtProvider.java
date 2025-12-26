@@ -9,7 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import com.greeni.api.apiPayload.exception.GeneralException;
+import com.greeni.api.apiPayload.handler.GeneralException;
 import com.greeni.api.apiPayload.status.JwtErrorStatus;
 import com.greeni.api.security.jwt.dto.JwtProperties;
 import com.greeni.api.security.jwt.userDetails.CustomUserDetails;

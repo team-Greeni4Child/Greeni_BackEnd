@@ -7,7 +7,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import com.greeni.api.common.base.BaseEntity;
-import com.greeni.api.diaries.enums.Emotion;
+import com.greeni.api.diaries.domain.enums.Emotion;
 import com.greeni.api.profiles.domain.Profile;
 
 import jakarta.persistence.CascadeType;

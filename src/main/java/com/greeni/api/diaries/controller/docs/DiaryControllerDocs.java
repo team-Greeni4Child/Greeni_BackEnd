@@ -1,4 +1,4 @@
-package com.greeni.api.diaries.docs;
+package com.greeni.api.diaries.controller.docs;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 

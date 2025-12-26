@@ -1,4 +1,4 @@
-package com.greeni.api.apiPayload.exception;
+package com.greeni.api.apiPayload.handler;
 
 import com.greeni.api.apiPayload.status.ErrorReason;
 
@@ -9,5 +9,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class GeneralException extends RuntimeException {
 
-    private final ErrorReason errorReason;
+	private final ErrorReason errorReason;
 }
