@@ -38,7 +38,6 @@ public class Diary extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false)
 	private String diaryImage;
 
 	@Column(nullable = false)
@@ -46,6 +45,9 @@ public class Diary extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	private Emotion emotion;
+
+	@Column(nullable = false)
+	private String keyword;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "profile_id")
