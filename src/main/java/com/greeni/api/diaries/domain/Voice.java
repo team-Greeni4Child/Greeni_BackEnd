@@ -1,16 +1,10 @@
 package com.greeni.api.diaries.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import com.greeni.api.common.base.BaseEntity;
-import com.greeni.api.diaries.domain.enums.Emotion;
-import com.greeni.api.profiles.domain.Profile;
+import com.greeni.api.diaries.domain.enums.VoiceRole;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,7 +15,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -34,31 +27,25 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "diaries")
+@Table(name = "voices")
 @DynamicUpdate
 @DynamicInsert
-public class Diary extends BaseEntity {
+public class Voice {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private String diaryImage;
+	@Column(nullable = false)
+	private String sessionId;
 
 	@Column(nullable = false)
-	private String summary;
+	private String voiceUrl;
 
 	@Enumerated(EnumType.STRING)
-	private Emotion emotion;
-
-	@Column(nullable = false)
-	private String keyword;
+	private VoiceRole voiceRole;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "profile_id")
-	private Profile profile;
-
-	@OneToMany(mappedBy = "diary", cascade = CascadeType.ALL)
-	@Builder.Default
-	private List<Voice> voiceList = new ArrayList<>();
+	@JoinColumn(name = "diary_id")
+	private Diary diary;
 }

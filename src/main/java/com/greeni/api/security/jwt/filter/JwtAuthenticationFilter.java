@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.greeni.api.apiPayload.exception.GeneralException;
+import com.greeni.api.apiPayload.handler.GeneralException;
 import com.greeni.api.apiPayload.status.JwtErrorStatus;
 import com.greeni.api.security.jwt.enums.RedisTokenType;
 import com.greeni.api.security.jwt.provider.JwtProvider;

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.greeni.api.apiPayload.CommonResponse;
-import com.greeni.api.members.docs.MemberControllerDocs;
+import com.greeni.api.members.controller.docs.MemberControllerDocs;
 import com.greeni.api.members.dto.MemberRequestDTO;
 import com.greeni.api.members.dto.MemberResponseDTO;
 import com.greeni.api.members.service.MemberService;
