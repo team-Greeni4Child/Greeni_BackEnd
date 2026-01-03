@@ -47,4 +47,12 @@ public class ProfileResponseDTO {
             String name,
             LocalDate birth
     ) {}
+
+    @Builder
+    public record GetAttendanceDiaryCountResponse(
+            Long profileId,
+            String name,
+            int attendance,
+            int diaryCount
+    ) {}
 }

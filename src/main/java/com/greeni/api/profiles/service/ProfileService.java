@@ -19,4 +19,7 @@ public interface ProfileService {
 
     // 프로필 단일 조회
     ProfileResponseDTO.GetProfileResponse getProfile(Long memberId, Long profileId);
+
+    // 출석 및 일기 횟수 조회
+    ProfileResponseDTO.GetAttendanceDiaryCountResponse getAttendanceDiaryCount(Long memberId, Long profileId);
 }

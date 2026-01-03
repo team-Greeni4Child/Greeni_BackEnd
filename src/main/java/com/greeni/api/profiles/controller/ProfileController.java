@@ -76,4 +76,14 @@ public class ProfileController implements ProfileControllerDocs {
 		ProfileResponseDTO.GetProfileResponse result = profileService.getProfile(customUserDetails.getId(), profileId);
 		return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
 	}
+
+	// 출석 및 일기 횟수 조회
+	@GetMapping("/{profileId}/statistics/count")
+	public ResponseEntity<CommonResponse<ProfileResponseDTO.GetAttendanceDiaryCountResponse>> findAttendanceDiaryCount(
+		@PathVariable Long profileId,
+		@AuthenticationPrincipal CustomUserDetails customUserDetails
+	) {
+		ProfileResponseDTO.GetAttendanceDiaryCountResponse result = profileService.getAttendanceDiaryCount(customUserDetails.getId(), profileId);
+		return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
+	}
 }
