@@ -3,6 +3,7 @@ package com.greeni.api.profiles.service;
 import com.greeni.api.apiPayload.handler.GeneralException;
 import com.greeni.api.apiPayload.status.MemberErrorStatus;
 import com.greeni.api.apiPayload.status.ProfileErrorStatus;
+import com.greeni.api.diaries.repository.DiaryRepository;
 import com.greeni.api.members.domain.Member;
 import com.greeni.api.members.repository.MemberRepository;
 import com.greeni.api.profiles.converter.ProfileConverter;
@@ -27,6 +28,7 @@ public class ProfileServiceImpl implements ProfileService {
 
 	private final ProfileRepository profileRepository;
 	private final MemberRepository memberRepository;
+	private final DiaryRepository diaryRepository;
 
 	// 프로필 생성
 	@Override
@@ -113,5 +115,22 @@ public class ProfileServiceImpl implements ProfileService {
 
 		// DTO 변환 후 반환
 		return ProfileConverter.toGetProfileResponseDTO(profile);
+	}
+
+	// 출석 및 일기 횟수 조회
+	@Override
+	public ProfileResponseDTO.GetAttendanceDiaryCountResponse getAttendanceDiaryCount(Long memberId, Long profileId) {
+		// Profile 엔티티 조회
+		Profile profile = profileRepository.findById(profileId)
+				.orElseThrow(() -> new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND));
+
+		// 본인 Profile인지 검증
+		if (!profile.getMember().getId().equals(memberId)) {
+			throw new GeneralException(ProfileErrorStatus.UNAUTHORIZED_PROFILE_ACCESS);
+		}
+
+		// DTO 변환 후 반환
+		int diaryCount = diaryRepository.countByProfileId(profileId);
+		return ProfileConverter.toAttendanceDiaryCountResponseDTO(profile, diaryCount);
 	}
 }

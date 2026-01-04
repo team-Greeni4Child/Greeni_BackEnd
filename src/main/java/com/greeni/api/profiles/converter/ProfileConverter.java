@@ -65,4 +65,14 @@ public class ProfileConverter {
                 .birth(profile.getBirth())
                 .build();
     }
+
+    // entity -> 출석 및 일기 횟수 조회 응답 DTO
+    public static ProfileResponseDTO.GetAttendanceDiaryCountResponse toAttendanceDiaryCountResponseDTO(Profile profile, int diaryCount) {
+        return ProfileResponseDTO.GetAttendanceDiaryCountResponse.builder()
+                .profileId(profile.getId())
+                .name(profile.getName())
+                .attendance(profile.getAttendance())
+                .diaryCount(diaryCount)
+                .build();
+    }
 }
