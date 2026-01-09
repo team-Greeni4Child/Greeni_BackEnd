@@ -18,7 +18,7 @@ jobs:
           java-version: '21'
           distribution: 'adopt'
 
-      - name: application.yml
+      - name: application.yml 추가
         run: echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application-dev.yml
 
       - name: gradlew mod modify
