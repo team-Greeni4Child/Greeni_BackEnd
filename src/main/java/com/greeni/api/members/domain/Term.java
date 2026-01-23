@@ -15,6 +15,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -40,10 +41,14 @@ public class Term extends BaseEntity {
 	@Column(nullable = false)
 	private String name;
 
-	@Column(nullable = false)
+	@Lob
+	@Column(nullable = false, columnDefinition = "LONGTEXT")
 	private String content;
 
 	private boolean required;
+
+	@Builder.Default
+	private int version = 1;
 
 	@OneToMany(mappedBy = "term", cascade = CascadeType.ALL)
 	@Builder.Default
