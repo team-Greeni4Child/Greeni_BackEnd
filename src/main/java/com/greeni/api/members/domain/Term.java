@@ -8,7 +8,6 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import com.greeni.api.common.base.BaseEntity;
 import com.greeni.api.members.domain.mapping.MemberTerm;
-import com.greeni.api.profiles.domain.Profile;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -16,6 +15,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -29,31 +29,28 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "members")
-@DynamicUpdate
 @DynamicInsert
-public class Member extends BaseEntity {
+@DynamicUpdate
+@Table(name = "terms")
+public class Term extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false, unique = true)
-	private String email;
-
 	@Column(nullable = false)
-	private String password;
+	private String name;
 
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	@Lob
+	@Column(nullable = false, columnDefinition = "LONGTEXT")
+	private String content;
+
+	private boolean required;
+
 	@Builder.Default
-	private List<Profile> profileList = new ArrayList<>();
+	private int version = 1;
 
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "term", cascade = CascadeType.ALL)
 	@Builder.Default
 	private List<MemberTerm> memberTermList = new ArrayList<>();
-
-	public void encodePassword(String password) {
-		this.password = password;
-	}
-
 }

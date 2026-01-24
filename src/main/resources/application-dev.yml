@@ -12,7 +12,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   sql:
     init:
-      mode: never
+      mode: always
   jpa:
     hibernate:
       ddl-auto: create
@@ -25,6 +25,7 @@ spring:
         use_sql_comments: true
         default_batch_fetch_size: 100
     show-sql: true
+    defer-datasource-initialization: true
   mail:
     host: smtp.gmail.com
     port: 587
