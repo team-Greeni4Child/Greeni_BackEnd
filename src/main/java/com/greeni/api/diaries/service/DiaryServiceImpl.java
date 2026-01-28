@@ -3,6 +3,7 @@ package com.greeni.api.diaries.service;
 import com.greeni.api.apiPayload.handler.GeneralException;
 import com.greeni.api.apiPayload.status.DiaryErrorStatus;
 import com.greeni.api.apiPayload.status.ProfileErrorStatus;
+import com.greeni.api.diaries.converter.DiaryConverter;
 import com.greeni.api.diaries.domain.Diary;
 import com.greeni.api.diaries.dto.DiaryResponseDTO;
 import com.greeni.api.diaries.repository.DiaryRepository;
@@ -10,9 +11,9 @@ import com.greeni.api.profiles.domain.Profile;
 import com.greeni.api.profiles.repository.ProfileRepository;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,7 +22,7 @@ import java.time.ZoneId;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class DiaryServiceImpl implements DiaryService {
 
     private final ProfileRepository profileRepository;
@@ -49,9 +50,6 @@ public class DiaryServiceImpl implements DiaryService {
                 .orElseThrow(() -> new GeneralException(DiaryErrorStatus.DIARY_NOT_FOUND_TODAY));
 
         // DTO 변환 후 반환
-        return DiaryResponseDTO.GetTodayDiaryKeywordResponse.builder()
-                .profileId(profileId)
-                .keyword(diary.getKeyword())
-                .build();
+        return DiaryConverter.toTodayDiaryKeywordResponseDTO(profileId, diary.getKeyword());
     }
 }
