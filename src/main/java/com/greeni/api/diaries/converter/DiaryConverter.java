@@ -10,6 +10,14 @@ import java.util.stream.Collectors;
 
 public class DiaryConverter {
 
+    // entity -> 오늘의 일기 키워드 조회 응답 DTO
+    public static DiaryResponseDTO.GetTodayDiaryKeywordResponse toTodayDiaryKeywordResponseDTO(Long profileId, String keyword) {
+        return DiaryResponseDTO.GetTodayDiaryKeywordResponse.builder()
+                .profileId(profileId)
+                .keyword(keyword)
+                .build();
+    }
+
     // entity -> 이번 달 일기 감정 통계 조회 응답 DTO
     public static DiaryResponseDTO.GetMonthlyDiaryEmotionResponse toMonthlyDiaryEmotionResponseDTO(Long profileId, List<Diary> diaries) {
         Map<Emotion, Long> counts = diaries.stream()

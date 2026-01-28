@@ -36,6 +36,16 @@ public class ProfileStatisticsController implements ProfileStatisticsControllerD
         return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
     }
 
+    // 오늘의 일기 키워드 조회
+    @GetMapping("/diaries/{profileId}/keyword")
+    public ResponseEntity<CommonResponse<DiaryResponseDTO.GetTodayDiaryKeywordResponse>> findTodayDiaryKeyword(
+            @PathVariable Long profileId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        DiaryResponseDTO.GetTodayDiaryKeywordResponse result = diaryService.getTodayDiaryKeyword(customUserDetails.getId(), profileId);
+        return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
+    }
+
     // 이번 달 일기 감정 통계 조회
     @GetMapping("/diaries/{profileId}/emotion")
     public ResponseEntity<CommonResponse<DiaryResponseDTO.GetMonthlyDiaryEmotionResponse>> findMonthlyDiaryEmotion(

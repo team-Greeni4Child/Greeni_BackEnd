@@ -4,6 +4,9 @@ import com.greeni.api.diaries.dto.DiaryResponseDTO;
 
 public interface DiaryService {
 
+    // 오늘의 일기 키워드 조회
+    DiaryResponseDTO.GetTodayDiaryKeywordResponse getTodayDiaryKeyword(Long memberId, Long profileId);
+
     // 이번 달 일기 감정 통계 조회
     DiaryResponseDTO.GetMonthlyDiaryEmotionResponse getMonthlyDiaryEmotion(Long memberId, Long profileId);
 

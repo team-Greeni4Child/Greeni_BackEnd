@@ -31,6 +31,21 @@ public interface ProfileStatisticsControllerDocs {
         @AuthenticationPrincipal CustomUserDetails customUserDetails
     );
 
+    @Operation(summary = "오늘의 일기 키워드 조회 API",
+        description = "사용자의 당일 일기 키워드를 조회하는 API",
+        responses = {
+            @ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다.",
+                           content = @Content(mediaType = "application/json", schema = @Schema(implementation = DiaryResponseDTO.GetTodayDiaryKeywordResponse.class))),
+            @ApiResponse(responseCode = "PROFILE4031", description = "해당 프로필에 접근할 권한이 없습니다."),
+            @ApiResponse(responseCode = "PROFILE4041", description = "존재하지 않는 프로필입니다."),
+            @ApiResponse(responseCode = "DIARY4041", description = "오늘 작성된 일기가 없습니다.")
+        })
+    ResponseEntity<CommonResponse<DiaryResponseDTO.GetTodayDiaryKeywordResponse>> findTodayDiaryKeyword(
+            @Parameter(description = "조회할 프로필의 ID", required = true)
+            @PathVariable Long profileId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    );
+
     @Operation(summary = "이번 달 일기 감정 통계 조회 API",
         description = "사용자의 이번 달 일기 감정 통계를 조회하는 API",
         responses = {
