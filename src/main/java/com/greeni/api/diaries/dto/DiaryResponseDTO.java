@@ -11,6 +11,18 @@ import java.util.List;
 public class DiaryResponseDTO {
 
     @Builder
+    public record GetMonthlyDiaryEmotionResponse(
+            Long profileId,
+            List<MonthlyEmotionStat> stats
+    ) {}
+
+    @Builder
+    public record MonthlyEmotionStat(
+            Emotion emotion,
+            long count
+    ) {}
+
+    @Builder
     @AllArgsConstructor
     @Getter
     @NoArgsConstructor
