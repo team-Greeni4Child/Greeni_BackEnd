@@ -10,5 +10,5 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
 
     int countByProfileId(Long profileId);
 
-    Optional<Diary> findTopByProfileIdAndCreatedAtBetweenOrderByCreatedAtDesc(Long profileId, LocalDateTime start, LocalDateTime end);
+    Optional<Diary> findByProfileIdAndCreatedAtBetween(Long profileId, LocalDateTime start, LocalDateTime end);
 }

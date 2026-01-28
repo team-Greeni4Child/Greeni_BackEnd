@@ -45,8 +45,8 @@ public class DiaryServiceImpl implements DiaryService {
         LocalDateTime end = today.plusDays(1).atStartOfDay();
 
         // Diary 엔티티 조회
-        Diary diary = diaryRepository.
-                findTopByProfileIdAndCreatedAtBetweenOrderByCreatedAtDesc(profileId, start, end)
+        Diary diary = diaryRepository
+                .findByProfileIdAndCreatedAtBetween(profileId, start, end)
                 .orElseThrow(() -> new GeneralException(DiaryErrorStatus.DIARY_NOT_FOUND_TODAY));
 
         // DTO 변환 후 반환
