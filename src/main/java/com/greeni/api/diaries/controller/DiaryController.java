@@ -30,7 +30,18 @@ public class DiaryController implements DiaryControllerDocs {
                                                                                                  @RequestParam int year,
                                                                                                  @RequestParam int month,
                                                                                                  @RequestParam Long profileId){
-        DiaryResponseDTO.MonthDiaryListDTO result = diaryService.getMonthDiaryList(year, month, customUserDetails.getId(),profileId);
+        DiaryResponseDTO.MonthDiaryListDTO result = diaryService.getMonthDiaryList(year, month, customUserDetails.getId(), profileId);
+        return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
+    }
+
+    // 일별 상세 일기 조회
+    @GetMapping("/day")
+    public ResponseEntity<CommonResponse<DiaryResponseDTO.DailyDiaryDTO>> findDailyDiary(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                            @RequestParam int year,
+                                                            @RequestParam int month,
+                                                            @RequestParam int day,
+                                                            @RequestParam Long profileId){
+        DiaryResponseDTO.DailyDiaryDTO result = diaryService.getDailyDiary(year, month, day, customUserDetails.getId(), profileId);
         return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
     }
 }

@@ -65,4 +65,43 @@ public class DiaryServiceImpl implements DiaryService {
         return DiaryConverter.toMonthDiaryListDTO(profileId, diaryList);
     }
 
+    @Override
+    @Transactional(readOnly=true)
+    public DiaryResponseDTO.DailyDiaryDTO getDailyDiary(int year, int month, int day, Long memberId, Long profileId){
+
+        Profile profile = profileRepository.findById(profileId)
+                .orElseThrow(() -> new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND));
+
+        // member의 profile인지 검증
+        if (!profile.getMember().getId().equals(memberId)) {
+            throw new GeneralException(ProfileErrorStatus.UNAUTHORIZED_PROFILE_ACCESS);
+        }
+
+        // 월 검증
+        if(month < 1 || month > 12){
+            throw new GeneralException(DiaryErrorStatus.INVALID_MONTH);
+        }
+
+        // 날짜 검증
+        YearMonth requestYm = YearMonth.of(year, month);
+        int lastDay = requestYm.lengthOfMonth();
+        if(day < 1 || day > lastDay){
+            throw new GeneralException(DiaryErrorStatus.INVALID_DAY);
+        }
+
+        // 미래 날짜 검증
+        LocalDate requestDate = LocalDate.of(year, month, day);
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+
+        if(requestDate.isAfter(today)){
+            throw new GeneralException(DiaryErrorStatus.FUTURE_TIME);
+        }
+
+        // 조회
+        Diary diary = diaryRepository.findByProfileIdAndDiaryDate(profileId, requestDate)
+                .orElseThrow(() -> new GeneralException(DiaryErrorStatus.NOT_WRITE_DIARY));
+
+        return DiaryConverter.toDailyDiaryDTO(profileId, diary);
+    }
+
 }
