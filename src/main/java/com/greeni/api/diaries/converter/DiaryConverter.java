@@ -21,4 +21,14 @@ public class DiaryConverter {
                 .diaries(result)
                 .build();
     }
+
+    public static DiaryResponseDTO.DailyDiaryDTO toDailyDiaryDTO(Long profileId, Diary diary) {
+        return DiaryResponseDTO.DailyDiaryDTO.builder()
+                .profileId(profileId)
+                .diaryImage(diary.getDiaryImage())
+                .keyword(diary.getKeyword())
+                .summary(diary.getSummary())
+                .emotion(diary.getEmotion())
+                .build();
+    }
 }

@@ -27,4 +27,16 @@ public class DiaryResponseDTO {
         Emotion emotion;
         int day;
     }
+
+    @Builder
+    @AllArgsConstructor
+    @Getter
+    @NoArgsConstructor
+    public static class DailyDiaryDTO{
+        Long profileId;
+        String diaryImage;
+        String summary;
+        Emotion emotion;
+        String keyword;
+    }
 }
