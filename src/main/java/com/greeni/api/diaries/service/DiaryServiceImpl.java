@@ -11,9 +11,9 @@ import com.greeni.api.profiles.domain.Profile;
 import com.greeni.api.profiles.repository.ProfileRepository;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +31,7 @@ public class DiaryServiceImpl implements DiaryService {
     private final ProfileRepository profileRepository;
 
     @Override
+    @Transactional(readOnly=true)
     public DiaryResponseDTO.MonthDiaryListDTO getMonthDiaryList(int year, int month, Long memberId, Long profileId) {
 
         Profile profile = profileRepository.findById(profileId)
@@ -54,15 +55,13 @@ public class DiaryServiceImpl implements DiaryService {
             throw new GeneralException(DiaryErrorStatus.FUTURE_TIME);
         }
 
-
-
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDate endDate = startDate.plusMonths(1);
 
         LocalDateTime start = startDate.atStartOfDay();
         LocalDateTime end = endDate.atStartOfDay();
 
-        List<Diary> diaryList = diaryRepository.findByProfileIdAndCreatedAtBetweenOrderByCreatedAtAsc(profileId, start, end);
+        List<Diary> diaryList = diaryRepository.findByProfileIdAndCreatedAtGreaterThanEqualAndCreatedAtLessThanOrderByCreatedAtAsc(profileId, start, end);
         return DiaryConverter.toMonthDiaryListDTO(profileId, diaryList);
     }
 
