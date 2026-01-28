@@ -27,4 +27,19 @@ public class DiaryConverter {
                 .stats(stats)
                 .build();
     }
+
+    public static DiaryResponseDTO.MonthDiaryListDTO toMonthDiaryListDTO(Long profileId, List<Diary> diaryList){
+        List<DiaryResponseDTO.MonthDiaryDTO> result = diaryList.stream()
+                .map(diary -> DiaryResponseDTO.MonthDiaryDTO.builder()
+                        .day(diary.getCreatedAt().getDayOfMonth())
+                        .emotion(diary.getEmotion())
+                        .build()
+                )
+                .toList();
+
+        return DiaryResponseDTO.MonthDiaryListDTO.builder()
+                .profileId(profileId)
+                .diaries(result)
+                .build();
+    }
 }

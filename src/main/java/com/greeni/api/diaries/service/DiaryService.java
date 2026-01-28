@@ -6,4 +6,6 @@ public interface DiaryService {
 
     // 이번 달 일기 감정 통계 조회
     DiaryResponseDTO.GetMonthlyDiaryEmotionResponse getMonthlyDiaryEmotion(Long memberId, Long profileId);
+
+    DiaryResponseDTO.MonthDiaryListDTO getMonthDiaryList(int year, int month, Long memberId, Long profileId);
 }
