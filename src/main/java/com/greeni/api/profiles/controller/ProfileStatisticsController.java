@@ -1,6 +1,8 @@
 package com.greeni.api.profiles.controller;
 
 import com.greeni.api.apiPayload.CommonResponse;
+import com.greeni.api.diaries.dto.DiaryResponseDTO;
+import com.greeni.api.diaries.service.DiaryService;
 import com.greeni.api.profiles.controller.docs.ProfileStatisticsControllerDocs;
 import com.greeni.api.profiles.dto.ProfileResponseDTO;
 import com.greeni.api.profiles.service.ProfileService;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProfileStatisticsController implements ProfileStatisticsControllerDocs {
 
     private final ProfileService profileService;
+    private final DiaryService diaryService;
 
     // 출석 및 일기 횟수 조회
     @GetMapping("/profiles/{profileId}/count")
@@ -30,6 +33,26 @@ public class ProfileStatisticsController implements ProfileStatisticsControllerD
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
         ProfileResponseDTO.GetAttendanceDiaryCountResponse result = profileService.getAttendanceDiaryCount(customUserDetails.getId(), profileId);
+        return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
+    }
+
+    // 오늘의 일기 키워드 조회
+    @GetMapping("/diaries/{profileId}/keyword")
+    public ResponseEntity<CommonResponse<DiaryResponseDTO.GetTodayDiaryKeywordResponse>> findTodayDiaryKeyword(
+            @PathVariable Long profileId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        DiaryResponseDTO.GetTodayDiaryKeywordResponse result = diaryService.getTodayDiaryKeyword(customUserDetails.getId(), profileId);
+        return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
+    }
+
+    // 이번 달 일기 감정 통계 조회
+    @GetMapping("/diaries/{profileId}/emotion")
+    public ResponseEntity<CommonResponse<DiaryResponseDTO.GetMonthlyDiaryEmotionResponse>> findMonthlyDiaryEmotion(
+            @PathVariable Long profileId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        DiaryResponseDTO.GetMonthlyDiaryEmotionResponse result = diaryService.getMonthlyDiaryEmotion(customUserDetails.getId(), profileId);
         return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
     }
 }
