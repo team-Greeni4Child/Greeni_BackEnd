@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.greeni.api.apiPayload.CommonResponse;
-import com.greeni.api.security.auth.docs.AuthControllerDocs;
+import com.greeni.api.security.auth.controller.docs.AuthControllerDocs;
 import com.greeni.api.security.auth.dto.AuthRequestDTO;
 import com.greeni.api.security.auth.dto.AuthResponseDTO;
 import com.greeni.api.security.auth.service.AuthService;
