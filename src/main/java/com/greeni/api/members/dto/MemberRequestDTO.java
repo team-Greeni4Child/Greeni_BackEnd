@@ -16,8 +16,8 @@ public class MemberRequestDTO {
 		@NotBlank(message = "이메일은 필수 입력입니다.")
 		@Email
 		@Pattern(
-			regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.(com|net|org|co\\.kr|go\\.kr)$",
-			message = "유효한 이메일 도메인만 입력하세요."
+				regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.(com|net|org|[a-z]+\\.kr)$",
+				message = "유효한 이메일 도메인만 입력하세요."
 		)
 		@Schema(description = "사용자가 입력한 이메일", example = "greeni4child@gmail.com")
 		private String email;
@@ -42,8 +42,8 @@ public class MemberRequestDTO {
 		@NotBlank(message = "이메일은 필수 입력입니다.")
 		@Email
 		@Pattern(
-			regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.(com|net|org|co\\.kr|go\\.kr)$",
-			message = "유효한 이메일 도메인만 입력하세요."
+				regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.(com|net|org|[a-z]+\\.kr)$",
+				message = "유효한 이메일 도메인만 입력하세요."
 		)
 		@Schema(description = "사용자가 입력한 이메일", example = "greeni4child@gmail.com")
 		private String email;
@@ -56,8 +56,8 @@ public class MemberRequestDTO {
 		@NotBlank(message = "이메일은 필수 입력입니다.")
 		@Email
 		@Pattern(
-			regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.(com|net|org|co\\.kr|go\\.kr)$",
-			message = "유효한 이메일 도메인만 입력하세요."
+				regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.(com|net|org|[a-z]+\\.kr)$",
+				message = "유효한 이메일 도메인만 입력하세요."
 		)
 		@Schema(description = "사용자가 입력한 이메일", example = "greeni4child@gmail.com")
 		private String email;
@@ -74,8 +74,8 @@ public class MemberRequestDTO {
 		@NotBlank(message = "이메일은 필수 입력입니다.")
 		@Email
 		@Pattern(
-			regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.(com|net|org|co\\.kr|go\\.kr)$",
-			message = "유효한 이메일 도메인만 입력하세요."
+				regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.(com|net|org|[a-z]+\\.kr)$",
+				message = "유효한 이메일 도메인만 입력하세요."
 		)
 		@Schema(description = "사용자가 입력한 이메일", example = "greeni4child@gmail.com")
 		private String email;
