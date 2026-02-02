@@ -133,7 +133,7 @@ public class DiaryServiceImpl implements DiaryService {
         return DiaryConverter.toDailyDiaryDTO(profileId, diary);
     }
 
-    public void findProfileAndValidate(Long profileId, Long memberId){
+    public Profile findProfileAndValidate(Long profileId, Long memberId){
         // Profile 엔티티 조회
         Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND));
@@ -142,6 +142,7 @@ public class DiaryServiceImpl implements DiaryService {
         if (!profile.getMember().getId().equals(memberId)) {
             throw new GeneralException(ProfileErrorStatus.UNAUTHORIZED_PROFILE_ACCESS);
         }
+        return profile;
     }
 
 }
