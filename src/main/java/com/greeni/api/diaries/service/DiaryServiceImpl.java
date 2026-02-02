@@ -34,14 +34,8 @@ public class DiaryServiceImpl implements DiaryService {
     @Override
     @Transactional(readOnly=true)
     public DiaryResponseDTO.GetTodayDiaryKeywordResponse getTodayDiaryKeyword(Long memberId, Long profileId) {
-        // Profile 엔티티 조회
-        Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND));
 
-        // 본인 Profile인지 검증
-        if (!profile.getMember().getId().equals(memberId)) {
-            throw new GeneralException(ProfileErrorStatus.UNAUTHORIZED_PROFILE_ACCESS);
-        }
+        findProfileAndValidate(profileId, memberId);
 
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
         LocalDateTime start = today.atStartOfDay();
@@ -60,14 +54,8 @@ public class DiaryServiceImpl implements DiaryService {
     @Override
     @Transactional(readOnly=true)
     public DiaryResponseDTO.GetMonthlyDiaryEmotionResponse getMonthlyDiaryEmotion(Long memberId, Long profileId) {
-        // Profile 엔티티 조회
-        Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND));
 
-        // 본인 Profile인지 검증
-        if (!profile.getMember().getId().equals(memberId)) {
-            throw new GeneralException(ProfileErrorStatus.UNAUTHORIZED_PROFILE_ACCESS);
-        }
+        findProfileAndValidate(profileId, memberId);
 
         LocalDate now = LocalDate.now(ZoneId.of("Asia/Seoul"));
         LocalDate firstDay = now.withDayOfMonth(1);
@@ -87,13 +75,7 @@ public class DiaryServiceImpl implements DiaryService {
     @Transactional(readOnly=true)
     public DiaryResponseDTO.MonthDiaryListDTO getMonthDiaryList(int year, int month, Long memberId, Long profileId) {
 
-        Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND));
-
-        // member의 profile인지 검증
-        if (!profile.getMember().getId().equals(memberId)) {
-            throw new GeneralException(ProfileErrorStatus.UNAUTHORIZED_PROFILE_ACCESS);
-        }
+        findProfileAndValidate(profileId, memberId);
 
         // 월 검증
         if(month < 1 || month > 12){
@@ -117,4 +99,50 @@ public class DiaryServiceImpl implements DiaryService {
         List<Diary> diaryList = diaryRepository.findByProfileIdAndCreatedAtGreaterThanEqualAndCreatedAtLessThanOrderByCreatedAtAsc(profileId, start, end);
         return DiaryConverter.toMonthDiaryListDTO(profileId, diaryList);
     }
+
+    @Override
+    @Transactional(readOnly=true)
+    public DiaryResponseDTO.DailyDiaryDTO getDailyDiary(int year, int month, int day, Long memberId, Long profileId){
+
+        findProfileAndValidate(profileId, memberId);
+
+        // 월 검증
+        if(month < 1 || month > 12){
+            throw new GeneralException(DiaryErrorStatus.INVALID_MONTH);
+        }
+
+        // 날짜 검증
+        YearMonth requestYm = YearMonth.of(year, month);
+        int lastDay = requestYm.lengthOfMonth();
+        if(day < 1 || day > lastDay){
+            throw new GeneralException(DiaryErrorStatus.INVALID_DAY);
+        }
+
+        // 미래 날짜 검증
+        LocalDate requestDate = LocalDate.of(year, month, day);
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+
+        if(requestDate.isAfter(today)){
+            throw new GeneralException(DiaryErrorStatus.FUTURE_TIME);
+        }
+
+        // 조회
+        Diary diary = diaryRepository.findByProfileIdAndDiaryDate(profileId, requestDate)
+                .orElseThrow(() -> new GeneralException(DiaryErrorStatus.NOT_WRITE_DIARY));
+
+        return DiaryConverter.toDailyDiaryDTO(profileId, diary);
+    }
+
+    public Profile findProfileAndValidate(Long profileId, Long memberId){
+        // Profile 엔티티 조회
+        Profile profile = profileRepository.findById(profileId)
+                .orElseThrow(() -> new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND));
+
+        // member의 profile인지 검증
+        if (!profile.getMember().getId().equals(memberId)) {
+            throw new GeneralException(ProfileErrorStatus.UNAUTHORIZED_PROFILE_ACCESS);
+        }
+        return profile;
+    }
+
 }

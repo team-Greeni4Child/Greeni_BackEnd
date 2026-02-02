@@ -4,6 +4,7 @@ import com.greeni.api.activities.dto.ActivityResponseDTO;
 import com.greeni.api.activities.service.ActivityService;
 import com.greeni.api.apiPayload.CommonResponse;
 import com.greeni.api.security.jwt.userDetails.CustomUserDetails;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,4 +37,14 @@ public class ActivityController implements ActivityControllerDocs {
         ActivityResponseDTO.GetActivitySummaryListResponse result = activityService.getActivitySummaryList(customUserDetails.getId(), profileId, page, size);
         return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
     }
+
+	@Override
+	@GetMapping("/day")
+	public ResponseEntity<CommonResponse<ActivityResponseDTO.DailyList>> getDailyActivityList(
+		@AuthenticationPrincipal CustomUserDetails customUserDetails,
+		@RequestParam Long profileId) {
+		ActivityResponseDTO.DailyList result = activityService
+			.getDailyActivityList(customUserDetails.getId(), profileId);
+		return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
+	}
 }

@@ -1,4 +1,4 @@
-package com.greeni.api.security.auth.docs;
+package com.greeni.api.security.auth.controller.docs;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +24,7 @@ public interface AuthControllerDocs {
 		summary = "로그인 API",
 		description = "사용자의 이메일과 비밀번호로 로그인을 진행하는 API",
 		responses = {
-			@ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다..",
+			@ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다.",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponseDTO.LoginResult.class))),
 			@ApiResponse(responseCode = "MEMBER4004", description = "존재하지 않는 메일입니다"),
 			@ApiResponse(responseCode = "MEMBER4007", description = "비밀번호가 일치하지 않습니다")

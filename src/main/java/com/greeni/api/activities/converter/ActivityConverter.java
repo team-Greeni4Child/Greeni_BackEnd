@@ -4,6 +4,7 @@ import com.greeni.api.activities.domain.Activity;
 import com.greeni.api.activities.dto.ActivityResponseDTO;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 public class ActivityConverter {
@@ -36,4 +37,15 @@ public class ActivityConverter {
                 .hasNext(hasNext)
                 .build();
     }
+
+	public static ActivityResponseDTO.DailyList toDailyActivityListResponseDTO(List<Activity> activityList) {
+
+		if (activityList.isEmpty()) {
+			return new ActivityResponseDTO.DailyList(Collections.emptyList());
+		}
+
+		return new ActivityResponseDTO.DailyList(
+			activityList.stream().map(Activity::getDescription).toList()
+		);
+	}
 }

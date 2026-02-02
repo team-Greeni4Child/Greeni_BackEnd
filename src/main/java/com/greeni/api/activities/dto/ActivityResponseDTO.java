@@ -29,4 +29,9 @@ public class ActivityResponseDTO {
             String description,
             LocalDateTime createdAt
     ) {}
+
+	@Builder
+	public record DailyList(
+		List<String> ActivityList
+	) {}
 }

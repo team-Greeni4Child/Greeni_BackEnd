@@ -11,16 +11,19 @@ import com.greeni.api.profiles.repository.ProfileRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Service
 @Slf4j
@@ -59,4 +62,25 @@ public class ActivityServiceImpl implements ActivityService {
         // DTO 변환 후 반환
         return ActivityConverter.toGetDailyActivityListResponseDTO(days, activityPage.getNumber(), activityPage.hasNext());
     }
+
+	@Override
+	@Transactional(readOnly = true)
+	public ActivityResponseDTO.DailyList getDailyActivityList(Long memberId, Long profileId) {
+
+		Profile profile = profileRepository.findById(profileId)
+			.orElseThrow(() -> new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND));
+
+		if (!profile.getMember().getId().equals(memberId)) {
+			throw new GeneralException(ProfileErrorStatus.UNAUTHORIZED_PROFILE_ACCESS);
+		}
+
+		LocalDate today = LocalDate.now();
+		LocalDateTime startTime = today.atStartOfDay();
+		LocalDateTime endTime = today.atTime(LocalTime.MAX);
+
+		List<Activity> activityList = activityRepository
+			.findTop3ByProfileAndCreatedAtBetweenOrderByCreatedAtDesc(profile, startTime, endTime);
+
+		return ActivityConverter.toDailyActivityListResponseDTO(activityList);
+	}
 }

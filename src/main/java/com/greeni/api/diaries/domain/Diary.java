@@ -1,5 +1,6 @@
 package com.greeni.api.diaries.domain;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +54,9 @@ public class Diary extends BaseEntity {
 
 	@Column(nullable = false)
 	private String keyword;
+
+	@Column(nullable = false)
+	private LocalDate diaryDate;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "profile_id")
