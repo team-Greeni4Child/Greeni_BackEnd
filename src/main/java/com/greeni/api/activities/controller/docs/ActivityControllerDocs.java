@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
+
 @Tag(name = "Activity", description = "활동요약 CR API")
 public interface ActivityControllerDocs {
 
@@ -28,7 +30,8 @@ public interface ActivityControllerDocs {
             })
     ResponseEntity<CommonResponse<ActivityResponseDTO.GetActivitySummaryListResponse>> findActivitySummaryList(
             @RequestParam Long profileId,
-            @RequestParam(defaultValue = "0") int page,
+			@RequestParam(required = false) LocalDateTime cursorCreatedAt,
+			@RequestParam(required = false) Long cursorId,
             @RequestParam(defaultValue = "8") int size,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     );

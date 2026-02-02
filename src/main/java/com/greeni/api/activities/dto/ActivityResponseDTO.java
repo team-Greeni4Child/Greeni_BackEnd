@@ -12,7 +12,8 @@ public class ActivityResponseDTO {
     @Builder
     public record GetActivitySummaryListResponse(
             List<DailyActivityGroup> days,
-            int page,
+            LocalDateTime nextCursorCreatedAt,
+            Long nextCursorId,
             boolean hasNext
     ) {}
 

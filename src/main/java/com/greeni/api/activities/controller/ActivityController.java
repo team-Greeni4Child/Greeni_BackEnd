@@ -18,6 +18,8 @@ import com.greeni.api.activities.controller.docs.ActivityControllerDocs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/activites")
@@ -29,12 +31,13 @@ public class ActivityController implements ActivityControllerDocs {
     // 활동 요약 목록 조회
     @GetMapping("/day/list")
     public ResponseEntity<CommonResponse<ActivityResponseDTO.GetActivitySummaryListResponse>> findActivitySummaryList(
-            @RequestParam Long profileId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails
+			@RequestParam Long profileId,
+			@RequestParam(required = false) LocalDateTime cursorCreatedAt,
+			@RequestParam(required = false) Long cursorId,
+			@RequestParam(defaultValue = "8") int size,
+			@AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
-        ActivityResponseDTO.GetActivitySummaryListResponse result = activityService.getActivitySummaryList(customUserDetails.getId(), profileId, page, size);
+        ActivityResponseDTO.GetActivitySummaryListResponse result = activityService.getActivitySummaryList(customUserDetails.getId(), profileId, cursorCreatedAt, cursorId, size);
         return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
     }
 

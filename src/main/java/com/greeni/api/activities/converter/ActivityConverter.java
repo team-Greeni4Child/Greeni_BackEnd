@@ -4,6 +4,7 @@ import com.greeni.api.activities.domain.Activity;
 import com.greeni.api.activities.dto.ActivityResponseDTO;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,10 +31,11 @@ public class ActivityConverter {
     }
 
     // entity list -> 목록 조회 응답 DTO
-    public static ActivityResponseDTO.GetActivitySummaryListResponse toGetDailyActivityListResponseDTO(List<ActivityResponseDTO.DailyActivityGroup> days, int page, boolean hasNext) {
+    public static ActivityResponseDTO.GetActivitySummaryListResponse toGetDailyActivityListResponseDTO(List<ActivityResponseDTO.DailyActivityGroup> days, LocalDateTime nextCursorCreatedAt, Long nextCursorId, boolean hasNext) {
         return ActivityResponseDTO.GetActivitySummaryListResponse.builder()
                 .days(days)
-                .page(page)
+                .nextCursorCreatedAt(nextCursorCreatedAt)
+                .nextCursorId(nextCursorId)
                 .hasNext(hasNext)
                 .build();
     }
