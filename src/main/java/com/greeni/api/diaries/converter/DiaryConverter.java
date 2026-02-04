@@ -1,6 +1,7 @@
 package com.greeni.api.diaries.converter;
 
 import com.greeni.api.diaries.domain.Diary;
+import com.greeni.api.diaries.domain.Voice;
 import com.greeni.api.diaries.domain.enums.Emotion;
 import com.greeni.api.diaries.dto.DiaryResponseDTO;
 
@@ -58,6 +59,24 @@ public class DiaryConverter {
                 .keyword(diary.getKeyword())
                 .summary(diary.getSummary())
                 .emotion(diary.getEmotion())
+                .build();
+    }
+
+    public static DiaryResponseDTO.DiaryVoiceListDTO toDiaryVoiceListDTO(List<Voice> voiceList, Long diaryId) {
+        List<DiaryResponseDTO.DiaryVoiceDTO> list = voiceList.stream()
+                .map(DiaryConverter::toDiaryVoiceDTO)
+                .toList();
+        return DiaryResponseDTO.DiaryVoiceListDTO.builder()
+                .diaryId(diaryId)
+                .voiceList(list)
+                .build();
+    }
+
+    public static DiaryResponseDTO.DiaryVoiceDTO toDiaryVoiceDTO(Voice voice) {
+        return DiaryResponseDTO.DiaryVoiceDTO.builder()
+                .voiceUrl(voice.getVoiceUrl())
+                .voiceRole(voice.getVoiceRole())
+                .createdAt(voice.getCreatedAt())
                 .build();
     }
 }
