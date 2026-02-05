@@ -15,7 +15,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -41,9 +40,8 @@ public class Term extends BaseEntity {
 	@Column(nullable = false)
 	private String name;
 
-	@Lob
-	@Column(nullable = false, columnDefinition = "LONGTEXT")
-	private String content;
+	@Column(nullable = false, columnDefinition = "TEXT")
+	private String fileUrl;
 
 	private boolean required;
 
