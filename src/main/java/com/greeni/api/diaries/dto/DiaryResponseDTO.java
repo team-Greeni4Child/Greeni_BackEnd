@@ -1,11 +1,13 @@
 package com.greeni.api.diaries.dto;
 
 import com.greeni.api.diaries.domain.enums.Emotion;
+import com.greeni.api.diaries.domain.enums.VoiceRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class DiaryResponseDTO {
@@ -56,5 +58,24 @@ public class DiaryResponseDTO {
         String summary;
         Emotion emotion;
         String keyword;
+    }
+
+    @Builder
+    @AllArgsConstructor
+    @Getter
+    @NoArgsConstructor
+    public static class DiaryVoiceListDTO{
+        List<DiaryVoiceDTO> voiceList;
+        Long diaryId;
+    }
+
+    @Builder
+    @AllArgsConstructor
+    @Getter
+    @NoArgsConstructor
+    public static class DiaryVoiceDTO{
+        String voiceUrl;
+        VoiceRole voiceRole;
+        LocalDateTime createdAt;
     }
 }
