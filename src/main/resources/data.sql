@@ -15,12 +15,12 @@ VALUES
 (9, '일기 50회 작성', 'https://temp.url/diary_50.png', NOW(), NOW()),
 (10, '일기 100회 작성', 'https://temp.url/diary_100.png', NOW(), NOW()),
 
--- 다섯고개 정답 관련 배지
-(11, '다섯고개 5회 정답', 'https://temp.url/quiz_5.png', NOW(), NOW()),
-(12, '다섯고개 10회 정답', 'https://temp.url/quiz_10.png', NOW(), NOW()),
-(13, '다섯고개 30회 정답', 'https://temp.url/quiz_30.png', NOW(), NOW()),
-(14, '다섯고개 50회 정답', 'https://temp.url/quiz_50.png', NOW(), NOW()),
-(15, '다섯고개 100회 정답', 'https://temp.url/quiz_100.png', NOW(), NOW()),
+-- 다섯고개 수행 관련 배지
+(11, '다섯고개 5회 수행', 'https://temp.url/quiz_5.png', NOW(), NOW()),
+(12, '다섯고개 10회 수행', 'https://temp.url/quiz_10.png', NOW(), NOW()),
+(13, '다섯고개 30회 수행', 'https://temp.url/quiz_30.png', NOW(), NOW()),
+(14, '다섯고개 50회 수행', 'https://temp.url/quiz_50.png', NOW(), NOW()),
+(15, '다섯고개 100회 수행', 'https://temp.url/quiz_100.png', NOW(), NOW()),
 
 -- 역할놀이 수행 관련 배지
 (16, '역할놀이 5회 수행', 'https://temp.url/roleplay_5.png', NOW(), NOW()),
