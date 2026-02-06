@@ -17,7 +17,7 @@ public class AuthRequestDTO {
 		@Email
 		private String email;
 		@NotBlank
-		@Schema(description = "사용자가 입력한 비밀번호", example = "1234asdf!")
+		@Schema(description = "사용자가 입력한 비밀번호", example = "1234@@sdqq")
 		private String password;
 	}
 }
