@@ -1,5 +1,6 @@
 package com.greeni.api.diaries.domain;
 
+import com.greeni.api.common.base.BaseEntity;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -30,7 +31,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "voices")
 @DynamicUpdate
 @DynamicInsert
-public class Voice {
+public class Voice extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

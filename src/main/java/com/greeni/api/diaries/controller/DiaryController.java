@@ -6,6 +6,7 @@ import com.greeni.api.diaries.dto.DiaryResponseDTO;
 import com.greeni.api.diaries.service.DiaryService;
 import com.greeni.api.security.jwt.userDetails.CustomUserDetails;
 import jakarta.validation.Valid;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -42,6 +43,16 @@ public class DiaryController implements DiaryControllerDocs {
                                                             @RequestParam int day,
                                                             @RequestParam Long profileId){
         DiaryResponseDTO.DailyDiaryDTO result = diaryService.getDailyDiary(year, month, day, customUserDetails.getId(), profileId);
+        return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
+    }
+
+    @GetMapping("/day/voice")
+    public ResponseEntity<CommonResponse<DiaryResponseDTO.DiaryVoiceListDTO>> findDailyDiaryVoice(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                                 @RequestParam int year,
+                                                                 @RequestParam int month,
+                                                                 @RequestParam int day,
+                                                                 @RequestParam Long profileId){
+        DiaryResponseDTO.DiaryVoiceListDTO result = diaryService.getDiaryVoice(year, month, day, customUserDetails.getId(), profileId);
         return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
     }
 }

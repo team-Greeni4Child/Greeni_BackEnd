@@ -5,8 +5,10 @@ import com.greeni.api.apiPayload.status.DiaryErrorStatus;
 import com.greeni.api.apiPayload.status.ProfileErrorStatus;
 import com.greeni.api.diaries.converter.DiaryConverter;
 import com.greeni.api.diaries.domain.Diary;
+import com.greeni.api.diaries.domain.Voice;
 import com.greeni.api.diaries.dto.DiaryResponseDTO;
 import com.greeni.api.diaries.repository.DiaryRepository;
+import com.greeni.api.diaries.repository.VoiceRepository;
 import com.greeni.api.profiles.domain.Profile;
 import com.greeni.api.profiles.repository.ProfileRepository;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class DiaryServiceImpl implements DiaryService {
 
     private final ProfileRepository profileRepository;
     private final DiaryRepository diaryRepository;
+    private final VoiceRepository voiceRepository;
 
     // 오늘의 일기 키워드 조회
     @Override
@@ -106,6 +109,35 @@ public class DiaryServiceImpl implements DiaryService {
 
         findProfileAndValidate(profileId, memberId);
 
+        LocalDate requestDate =  checkDateValidate(year, month, day);
+
+
+        // 조회
+        Diary diary = diaryRepository.findByProfileIdAndDiaryDate(profileId, requestDate)
+                .orElseThrow(() -> new GeneralException(DiaryErrorStatus.NOT_WRITE_DIARY));
+
+        return DiaryConverter.toDailyDiaryDTO(profileId, diary);
+    }
+
+    @Override
+    @Transactional(readOnly=true)
+    public DiaryResponseDTO.DiaryVoiceListDTO getDiaryVoice(int year, int month, int day, Long memberId, Long profileId) {
+
+        findProfileAndValidate(profileId, memberId);
+
+        LocalDate requestDate = checkDateValidate(year, month, day);
+
+        // 날짜 기준으로 일기 조회
+
+        Diary diary = diaryRepository.findByProfileIdAndDiaryDate(profileId, requestDate)
+                .orElseThrow(() -> new GeneralException(DiaryErrorStatus.NOT_WRITE_DIARY));
+        // 음성 리스트 뽑기
+        List<Voice> voiceList = voiceRepository.findByDiaryIdOrderByCreatedAtAsc(diary.getId());
+
+        return DiaryConverter.toDiaryVoiceListDTO(voiceList, diary.getId());
+    }
+
+    public LocalDate checkDateValidate(int year, int month, int day){
         // 월 검증
         if(month < 1 || month > 12){
             throw new GeneralException(DiaryErrorStatus.INVALID_MONTH);
@@ -121,16 +153,10 @@ public class DiaryServiceImpl implements DiaryService {
         // 미래 날짜 검증
         LocalDate requestDate = LocalDate.of(year, month, day);
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
-
         if(requestDate.isAfter(today)){
             throw new GeneralException(DiaryErrorStatus.FUTURE_TIME);
         }
-
-        // 조회
-        Diary diary = diaryRepository.findByProfileIdAndDiaryDate(profileId, requestDate)
-                .orElseThrow(() -> new GeneralException(DiaryErrorStatus.NOT_WRITE_DIARY));
-
-        return DiaryConverter.toDailyDiaryDTO(profileId, diary);
+        return requestDate;
     }
 
     public Profile findProfileAndValidate(Long profileId, Long memberId){

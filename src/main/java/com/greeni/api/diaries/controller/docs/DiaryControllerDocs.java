@@ -51,4 +51,23 @@ public interface DiaryControllerDocs {
                                                                                   @RequestParam int month,
                                                                                   @RequestParam int day,
                                                                                   @RequestParam Long profileId);
+
+    @Operation(summary = "일기 음성 조회 API",
+            description = "특정 날짜의 일기의 음성을 조회하는 API",
+            responses = {
+                    @ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다.",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = DiaryResponseDTO.DiaryVoiceListDTO.class))),
+                    @ApiResponse(responseCode = "PROFILE4041", description = "존재하지 않는 프로필입니다."),
+                    @ApiResponse(responseCode = "PROFILE4031", description = "해당 프로필에 접근할 권한이 없습니다."),
+                    @ApiResponse(responseCode = "DIARY4001", description = "미래의 연/월입니다."),
+                    @ApiResponse(responseCode = "DIARY4002", description = "월은 1과 12 사이의 숫자이어야 합니다."),
+                    @ApiResponse(responseCode = "DIARY4003", description = "해당 월에 유효한 날짜가 아닙니다"),
+                    @ApiResponse(responseCode = "DIARY4004", description = "해당 날짜에 작성한 일기가 없습니다.")
+
+            })
+    ResponseEntity<CommonResponse<DiaryResponseDTO.DiaryVoiceListDTO>> findDailyDiaryVoice(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                                                           @RequestParam int year,
+                                                                                           @RequestParam int month,
+                                                                                           @RequestParam int day,
+                                                                                           @RequestParam Long profileId);
 }
