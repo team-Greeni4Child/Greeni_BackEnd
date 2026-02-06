@@ -60,7 +60,8 @@ public interface ActivityControllerDocs {
 			@ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다.",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = ActivityResponseDTO.ActivityCreateResponse.class))),
 			@ApiResponse(responseCode = "PROFILE4031", description = "해당 프로필에 접근할 권한이 없습니다."),
-			@ApiResponse(responseCode = "PROFILE4041", description = "존재하지 않는 프로필입니다.")
+			@ApiResponse(responseCode = "PROFILE4041", description = "존재하지 않는 프로필입니다."),
+			@ApiResponse(responseCode = "BADGE4041", description = "해당 배지를 찾을 수 없습니다.")
 		})
 	ResponseEntity<CommonResponse<ActivityResponseDTO.ActivityCreateResponse>> createFiveQuestionsActivity(
 		@AuthenticationPrincipal CustomUserDetails customUserDetails,
@@ -74,7 +75,8 @@ public interface ActivityControllerDocs {
 			@ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다.",
 				content = @Content(mediaType = "application/json", schema = @Schema(implementation = ActivityResponseDTO.ActivityCreateResponse.class))),
 			@ApiResponse(responseCode = "PROFILE4031", description = "해당 프로필에 접근할 권한이 없습니다."),
-			@ApiResponse(responseCode = "PROFILE4041", description = "존재하지 않는 프로필입니다.")
+			@ApiResponse(responseCode = "PROFILE4041", description = "존재하지 않는 프로필입니다."),
+			@ApiResponse(responseCode = "BADGE4041", description = "해당 배지를 찾을 수 없습니다.")
 		})
 	ResponseEntity<CommonResponse<ActivityResponseDTO.ActivityCreateResponse>> createRolePlayingActivity(
 		@AuthenticationPrincipal CustomUserDetails customUserDetails,
