@@ -33,8 +33,8 @@ public class S3ServiceImpl implements S3Service {
 		return expiration;
 	}
 
-	public S3ResponseDTO.GetS3UrlDTO upload(Long id, String file) {
-		String fileName = "diary" + "/" + id + "/" + UUID.randomUUID().toString() + "/" + file;
+	public S3ResponseDTO.GetS3UrlDTO upload(Long id, String path, String file) {
+		String fileName = path + "/" + id + "/" + UUID.randomUUID().toString() + "/" + file;
 		Date expiration = getExpiration();
 
 		GeneratePresignedUrlRequest generatePresignedUrlRequest = getGeneratePresignedUrlRequest(fileName, expiration);

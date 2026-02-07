@@ -22,8 +22,10 @@ public class S3Controller implements S3ControllerDocs {
 
 	@GetMapping()
 	public CommonResponse<S3ResponseDTO.GetS3UrlDTO> uploadFile(
-		@AuthenticationPrincipal CustomUserDetails customUserDetails, String file) {
-		return CommonResponse.onSuccess(s3Service.upload(customUserDetails.getId(), file));
+		@AuthenticationPrincipal CustomUserDetails customUserDetails,
+		@RequestParam String path,
+		@RequestParam String fileName) {
+		return CommonResponse.onSuccess(s3Service.upload(customUserDetails.getId(), path, fileName));
 	}
 
 }

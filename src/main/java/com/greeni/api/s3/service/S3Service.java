@@ -7,6 +7,6 @@ import java.io.IOException;
 
 public interface S3Service {
 
-    S3ResponseDTO.GetS3UrlDTO upload(Long id, String file);
+    S3ResponseDTO.GetS3UrlDTO upload(Long id, String path, String fileName);
 
 }
