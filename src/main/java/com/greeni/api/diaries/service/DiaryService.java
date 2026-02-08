@@ -1,6 +1,7 @@
 package com.greeni.api.diaries.service;
 
 import com.greeni.api.diaries.dto.DiaryResponseDTO;
+import com.greeni.api.profiles.domain.Profile;
 
 public interface DiaryService {
 
@@ -16,4 +17,5 @@ public interface DiaryService {
 
     DiaryResponseDTO.DiaryVoiceListDTO getDiaryVoice(int year, int month, int day, Long memberId, Long profileId);
 
+	Profile findProfileAndValidate(Long profileId, Long memberId);
 }
