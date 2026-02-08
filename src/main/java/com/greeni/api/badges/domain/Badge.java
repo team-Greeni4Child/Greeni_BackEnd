@@ -1,14 +1,27 @@
 package com.greeni.api.badges.domain;
 
-import com.greeni.api.common.base.BaseEntity;
-import com.greeni.api.profiles.domain.mapping.ProfileBadge;
-import jakarta.persistence.*;
-import lombok.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.greeni.api.common.base.BaseEntity;
+import com.greeni.api.profiles.domain.mapping.ProfileBadge;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Builder
@@ -20,18 +33,18 @@ import java.util.List;
 @DynamicInsert
 public class Badge extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = false)
-    private String name;
+	@Column(nullable = false)
+	private String name;
 
-    @Column(nullable = false)
-    private String description;
+	@Column(nullable = false)
+	private String imageUrl;
 
-    @OneToMany(mappedBy = "badge", cascade = CascadeType.ALL)
-    @Builder.Default
-    private List<ProfileBadge> profileBadgeList = new ArrayList<>();
+	@OneToMany(mappedBy = "badge", cascade = CascadeType.ALL)
+	@Builder.Default
+	private List<ProfileBadge> profileBadgeList = new ArrayList<>();
 
 }

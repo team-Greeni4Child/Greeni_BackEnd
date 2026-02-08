@@ -1,5 +1,22 @@
 package com.greeni.api.apiPayload.exception;
 
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -13,22 +30,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @RestControllerAdvice(annotations = {RestController.class})
@@ -89,11 +90,17 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 			List<JsonMappingException.Reference> path = ife.getPath();
 			if (!path.isEmpty()) {
 				String fieldName = path.getFirst().getFieldName();
-				String targetType = ife.getTargetType().getSimpleName();
-				details = String.format("'%s' 필드의 입력값은 '%s' 타입이어야 합니다.", fieldName, targetType);
+				Class<?> targetType = ife.getTargetType();
+				if (targetType == null) {
+					details = String.format("'%s' 필드의 값을 확인해주세요.", fieldName);
+				} else if (targetType.isEnum()) {
+					String allowedValues = Arrays.toString(targetType.getEnumConstants());
+					details = String.format("'%s' 필드는 다음 값 중 하나여야 합니다: %s", fieldName, allowedValues);
+				} else {
+					details = String.format("'%s' 필드는 '%s' 타입이어야 합니다.", fieldName, targetType.getSimpleName());
+				}
 			} else {
-				log.error("파싱 에러 cause: ", cause);
-				details = "파싱 에러 cause: " + cause;
+				details = "형식 변환 중 에러가 발생했습니다.";
 			}
 		} else if (cause instanceof MismatchedInputException mie) {
 			List<JsonMappingException.Reference> path = mie.getPath();
