@@ -3,8 +3,12 @@ package com.greeni.api.diaries.converter;
 import com.greeni.api.diaries.domain.Diary;
 import com.greeni.api.diaries.domain.Voice;
 import com.greeni.api.diaries.domain.enums.Emotion;
+import com.greeni.api.diaries.domain.enums.VoiceRole;
+import com.greeni.api.diaries.dto.DiaryRequestDTO;
 import com.greeni.api.diaries.dto.DiaryResponseDTO;
+import com.greeni.api.profiles.domain.Profile;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -77,6 +81,26 @@ public class DiaryConverter {
                 .voiceUrl(voice.getVoiceUrl())
                 .voiceRole(voice.getVoiceRole())
                 .createdAt(voice.getCreatedAt())
+                .build();
+    }
+
+    public static Diary toDiary(DiaryRequestDTO.DiarySaveDTO request, Profile profile) {
+        return Diary.builder()
+                .diaryDate(LocalDate.now())
+                .keyword(request.getKeyword())
+                .diaryImage(request.getImageUrl())
+                .emotion(Emotion.toEmotion(request.getEmotion()))
+                .summary(request.getSummary())
+                .profile(profile)
+                .build();
+    }
+
+
+
+
+    public static DiaryResponseDTO.CreateDiaryDTO toCreateDiaryDTO(Long diaryId) {
+        return DiaryResponseDTO.CreateDiaryDTO.builder()
+                .diaryId(diaryId)
                 .build();
     }
 }
