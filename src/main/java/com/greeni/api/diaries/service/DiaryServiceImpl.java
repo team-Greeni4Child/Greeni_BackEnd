@@ -6,6 +6,15 @@ import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.List;
 
+import com.greeni.api.activities.converter.ActivityConverter;
+import com.greeni.api.activities.domain.Activity;
+import com.greeni.api.activities.domain.enums.ActivityType;
+import com.greeni.api.activities.repository.ActivityRepository;
+import com.greeni.api.activities.service.ActivityService;
+import com.greeni.api.badges.service.BadgeService;
+import com.greeni.api.diaries.converter.VoiceConverter;
+import com.greeni.api.diaries.dto.DiaryRequestDTO;
+import com.greeni.api.profiles.service.ProfileQueryService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,15 +40,19 @@ import lombok.extern.slf4j.Slf4j;
 public class DiaryServiceImpl implements DiaryService {
 
     private final ProfileRepository profileRepository;
+	private final ProfileQueryService profileQueryService;
+	private final ActivityRepository activityRepository;
     private final DiaryRepository diaryRepository;
     private final VoiceRepository voiceRepository;
+	private final ActivityService activityService;
+	private final BadgeService badgeService;
 
 	// 오늘의 일기 키워드 조회
 	@Override
 	@Transactional(readOnly = true)
 	public DiaryResponseDTO.GetTodayDiaryKeywordResponse getTodayDiaryKeyword(Long memberId, Long profileId) {
 
-		findProfileAndValidate(profileId, memberId);
+		profileQueryService.findProfileAndValidate(profileId, memberId);
 
 		LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 		LocalDateTime start = today.atStartOfDay();
@@ -59,7 +72,7 @@ public class DiaryServiceImpl implements DiaryService {
 	@Transactional(readOnly = true)
 	public DiaryResponseDTO.GetMonthlyDiaryEmotionResponse getMonthlyDiaryEmotion(Long memberId, Long profileId) {
 
-		findProfileAndValidate(profileId, memberId);
+		profileQueryService.findProfileAndValidate(profileId, memberId);
 
 		LocalDate now = LocalDate.now(ZoneId.of("Asia/Seoul"));
 		LocalDate firstDay = now.withDayOfMonth(1);
@@ -79,7 +92,7 @@ public class DiaryServiceImpl implements DiaryService {
 	@Transactional(readOnly = true)
 	public DiaryResponseDTO.MonthDiaryListDTO getMonthDiaryList(int year, int month, Long memberId, Long profileId) {
 
-		findProfileAndValidate(profileId, memberId);
+		profileQueryService.findProfileAndValidate(profileId, memberId);
 
 		// 월 검증
 		if (month < 1 || month > 12) {
@@ -108,7 +121,7 @@ public class DiaryServiceImpl implements DiaryService {
 	@Transactional(readOnly = true)
 	public DiaryResponseDTO.DailyDiaryDTO getDailyDiary(int year, int month, int day, Long memberId, Long profileId) {
 
-		findProfileAndValidate(profileId, memberId);
+		profileQueryService.findProfileAndValidate(profileId, memberId);
 
         LocalDate requestDate =  checkDateValidate(year, month, day);
 
@@ -124,7 +137,7 @@ public class DiaryServiceImpl implements DiaryService {
     @Transactional(readOnly=true)
     public DiaryResponseDTO.DiaryVoiceListDTO getDiaryVoice(int year, int month, int day, Long memberId, Long profileId) {
 
-        findProfileAndValidate(profileId, memberId);
+		profileQueryService.findProfileAndValidate(profileId, memberId);
 
         LocalDate requestDate = checkDateValidate(year, month, day);
 
@@ -161,16 +174,23 @@ public class DiaryServiceImpl implements DiaryService {
     }
 
 	@Override
-	public Profile findProfileAndValidate(Long profileId, Long memberId) {
-		// Profile 엔티티 조회
-		Profile profile = profileRepository.findById(profileId)
-			.orElseThrow(() -> new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND));
+	public DiaryResponseDTO.CreateDiaryDTO createDiary(Long memberId, DiaryRequestDTO.DiarySaveDTO request) {
+		Profile profile = profileQueryService.findProfileAndValidate(request.getProfileId(), memberId);
 
-		// member의 profile인지 검증
-		if (!profile.getMember().getId().equals(memberId)) {
-			throw new GeneralException(ProfileErrorStatus.UNAUTHORIZED_PROFILE_ACCESS);
-		}
-		return profile;
+		Diary diary = DiaryConverter.toDiary(request, profile);
+		diaryRepository.save(diary);
+		List<Voice> voiceList = VoiceConverter.toVoice(request.getVoiceList(), request.getSessionId(), diary);
+		voiceRepository.saveAll(voiceList);
+
+		String description = "일기 작성을 완료했습니다.";
+		Activity newActivity = ActivityConverter.toActivity(
+				ActivityType.DIARY, description, profile, null);
+		activityService.checkTodayActivity(profile);
+		activityRepository.save(newActivity);
+
+		badgeService.checkAndAwardBadge(profile, ActivityType.DIARY);
+
+		return DiaryConverter.toCreateDiaryDTO(diary.getId());
 	}
 
 }

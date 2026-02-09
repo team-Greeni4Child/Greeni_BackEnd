@@ -1,6 +1,7 @@
 package com.greeni.api.diaries.controller.docs;
 
 import com.greeni.api.apiPayload.CommonResponse;
+import com.greeni.api.diaries.dto.DiaryRequestDTO;
 import com.greeni.api.diaries.dto.DiaryResponseDTO;
 import com.greeni.api.profiles.dto.ProfileResponseDTO;
 import com.greeni.api.security.jwt.userDetails.CustomUserDetails;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Diary", description = "일기 CRU API")
@@ -70,4 +72,17 @@ public interface DiaryControllerDocs {
                                                                                            @RequestParam int month,
                                                                                            @RequestParam int day,
                                                                                            @RequestParam Long profileId);
+
+    @Operation(summary = "일기 저장 API",
+            description = "오늘의 일기를 저장하는 API",
+            responses = {
+                    @ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다.",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = DiaryResponseDTO.CreateDiaryDTO.class))),
+                    @ApiResponse(responseCode = "PROFILE4041", description = "존재하지 않는 프로필입니다."),
+                    @ApiResponse(responseCode = "PROFILE4031", description = "해당 프로필에 접근할 권한이 없습니다."),
+                    @ApiResponse(responseCode = "BADGE4041", description = "해당 배지를 찾을 수 없습니다.")
+
+            })
+    ResponseEntity<CommonResponse<DiaryResponseDTO.CreateDiaryDTO>> makeDiary(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                                              @RequestBody DiaryRequestDTO.DiarySaveDTO request);
 }
