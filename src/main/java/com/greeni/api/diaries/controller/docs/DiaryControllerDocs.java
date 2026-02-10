@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -81,8 +82,7 @@ public interface DiaryControllerDocs {
                     @ApiResponse(responseCode = "PROFILE4041", description = "존재하지 않는 프로필입니다."),
                     @ApiResponse(responseCode = "PROFILE4031", description = "해당 프로필에 접근할 권한이 없습니다."),
                     @ApiResponse(responseCode = "BADGE4041", description = "해당 배지를 찾을 수 없습니다.")
-
             })
     ResponseEntity<CommonResponse<DiaryResponseDTO.CreateDiaryDTO>> makeDiary(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                                              @RequestBody DiaryRequestDTO.DiarySaveDTO request);
+                                                                              @RequestBody @Valid DiaryRequestDTO.DiarySaveDTO request);
 }

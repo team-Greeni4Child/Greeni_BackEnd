@@ -58,7 +58,7 @@ public class DiaryController implements DiaryControllerDocs {
 
     @PostMapping("/")
     public ResponseEntity<CommonResponse<DiaryResponseDTO.CreateDiaryDTO>> makeDiary(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                                                     @RequestBody DiaryRequestDTO.DiarySaveDTO request){
+                                                                                     @RequestBody @Valid DiaryRequestDTO.DiarySaveDTO request){
         DiaryResponseDTO.CreateDiaryDTO result = diaryService.createDiary(customUserDetails.getId(), request);
         return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
     }
