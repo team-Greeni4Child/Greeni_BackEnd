@@ -27,6 +27,6 @@ public interface S3ControllerDocs {
 		}
 	)
 	CommonResponse<S3ResponseDTO.GetS3UrlDTO> uploadFile(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-		String file);
+		@RequestParam String path, @RequestParam String fileName);
 
 }

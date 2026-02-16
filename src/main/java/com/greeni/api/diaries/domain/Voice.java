@@ -38,7 +38,7 @@ public class Voice extends BaseEntity {
 	private Long id;
 
 	@Column(nullable = false)
-	private String sessionId;
+	private Long sessionId;
 
 	@Column(nullable = false)
 	private String voiceUrl;

@@ -78,4 +78,12 @@ public class DiaryResponseDTO {
         VoiceRole voiceRole;
         LocalDateTime createdAt;
     }
+
+    @Builder
+    @AllArgsConstructor
+    @Getter
+    @NoArgsConstructor
+    public static class CreateDiaryDTO{
+        Long diaryId;
+    }
 }

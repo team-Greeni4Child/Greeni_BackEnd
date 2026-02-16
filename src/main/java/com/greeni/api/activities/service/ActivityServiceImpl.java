@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.greeni.api.profiles.service.ProfileQueryService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -36,8 +37,7 @@ public class ActivityServiceImpl implements ActivityService {
 
 	private final ProfileRepository profileRepository;
 	private final ActivityRepository activityRepository;
-
-	private final DiaryService diaryService;
+	private final ProfileQueryService profileQueryService;
 	private final BadgeService badgeService;
 
 	// 활동 요약 목록 조회
@@ -93,7 +93,7 @@ public class ActivityServiceImpl implements ActivityService {
 	@Transactional(readOnly = true)
 	public ActivityResponseDTO.DailyList getDailyActivityList(Long memberId, Long profileId) {
 
-		Profile profile = diaryService.findProfileAndValidate(profileId, memberId);
+		Profile profile = profileQueryService.findProfileAndValidate(profileId, memberId);
 
 		LocalDate today = LocalDate.now();
 		LocalDateTime startTime = today.atStartOfDay();
@@ -109,7 +109,7 @@ public class ActivityServiceImpl implements ActivityService {
 	public ActivityResponseDTO.ActivityCreateResponse createFiveQuestionsActivity(Long memberId,
 		ActivityRequestDTO.FiveQuestionCreateRequest request) {
 
-		Profile profile = diaryService.findProfileAndValidate(request.profileId(), memberId);
+		Profile profile = profileQueryService.findProfileAndValidate(request.profileId(), memberId);
 
 		String description =
 			request.count() == 0 ? "다섯고개에서 정답을 맞히지 못했어요." : "다섯고개에서 " + request.count() + "턴만에 정답을 맞혔어요.";
@@ -129,7 +129,7 @@ public class ActivityServiceImpl implements ActivityService {
 	public ActivityResponseDTO.ActivityCreateResponse createRolePlayingActivity(Long memberId,
 		ActivityRequestDTO.RolePlayingCreateRequest request) {
 
-		Profile profile = diaryService.findProfileAndValidate(request.profileId(), memberId);
+		Profile profile = profileQueryService.findProfileAndValidate(request.profileId(), memberId);
 
 		String description = "역할놀이에서 " + request.roleName().getName() + "역할을 맡았어요.";
 		Activity newActivity = ActivityConverter.toActivity(
