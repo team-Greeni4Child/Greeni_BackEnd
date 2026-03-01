@@ -49,5 +49,6 @@ jobs:
             sudo docker stop greeni || true
             sudo docker rm greeni || true
             sudo docker run -d --name greeni -p 8080:8080 \
+            -e SPRING_PROFILES_ACTIVE=dev \
               ${{ secrets.DOCKER_USERNAME }}/greeni:latest
             sudo docker image prune -f
