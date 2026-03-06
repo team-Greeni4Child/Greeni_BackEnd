@@ -84,7 +84,7 @@ public class BadgeServiceImpl implements BadgeService {
 
 		boolean alreadyHas = profileBadgeRepository.existsByProfileAndBadge(profile, badge);
 		if (!alreadyHas) {
-			String description = badgeName + "배지를 획득했어요.";
+			String description = "[" + badgeName + "] 배지를 획득했어요.";
 			activityRepository.save(ActivityConverter.toActivity(ActivityType.BADGE, description, profile, badgeName));
 
 			ProfileBadge profileBadge = ProfileBadge.builder()

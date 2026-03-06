@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.greeni.api.profiles.service.ProfileQueryService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,9 +21,9 @@ import com.greeni.api.activities.repository.ActivityRepository;
 import com.greeni.api.apiPayload.handler.GeneralException;
 import com.greeni.api.apiPayload.status.ProfileErrorStatus;
 import com.greeni.api.badges.service.BadgeService;
-import com.greeni.api.diaries.service.DiaryService;
 import com.greeni.api.profiles.domain.Profile;
 import com.greeni.api.profiles.repository.ProfileRepository;
+import com.greeni.api.profiles.service.ProfileQueryService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -131,7 +130,7 @@ public class ActivityServiceImpl implements ActivityService {
 
 		Profile profile = profileQueryService.findProfileAndValidate(request.profileId(), memberId);
 
-		String description = "역할놀이에서 " + request.roleName().getName() + "역할을 맡았어요.";
+		String description = "역할놀이에서 " + request.roleName().getName() + " 역할을 맡았어요.";
 		Activity newActivity = ActivityConverter.toActivity(
 			ActivityType.ROLE_PLAYING, description, profile, null
 		);
