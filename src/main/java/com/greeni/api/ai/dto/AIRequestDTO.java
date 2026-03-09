@@ -42,16 +42,13 @@ public class AIRequestDTO {
 		@JsonProperty("user_text")
 		String userText,
 
-		@NotNull(message = "필수 입력입니다.")
 		@Schema(description = "창의성 조절", example = "0.7")
 		Float temperature,
 
-		@NotNull(message = "필수 입력입니다.")
 		@Schema(description = "일관성 조절", example = "1.0")
 		@JsonProperty("top_p")
 		Float topP,
 
-		@NotNull(message = "필수 입력입니다.")
 		@Schema(description = "토큰 수 제한", example = "256")
 		@JsonProperty("max_tokens")
 		Integer maxTokens

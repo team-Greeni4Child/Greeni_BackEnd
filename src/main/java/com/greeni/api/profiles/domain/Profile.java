@@ -92,6 +92,7 @@ public class Profile extends BaseEntity {
 		this.birth = birth;
 	}
 
+	// 프로필 출석 일수 증가 편의 메서드
 	public void attend() {
 		this.attendance++;
 	}
