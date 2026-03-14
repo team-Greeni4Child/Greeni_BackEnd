@@ -1,10 +1,7 @@
 package com.greeni.api.profiles.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
@@ -19,7 +16,7 @@ public class ProfileRequestDTO {
             @Schema(description = "사용자 이름", example = "그리니")
             String name,
 
-            @Past(message = "생년원일은 과거 날짜여야 합니다.")
+            @PastOrPresent(message = "생년원일은 과거 또는 오늘 날짜여야 합니다.")
             @NotNull(message = "생년원일은 필수 입력입니다.")
             @Schema(description = "사용자 생년월일 (yyyy-MM-dd 형식)", example = "2025-11-20")
             LocalDate birth
@@ -34,7 +31,7 @@ public class ProfileRequestDTO {
             @Schema(description = "수정할 사용자 이름", example = "개굴개굴")
             String name,
 
-            @Past(message = "생년원일은 과거 날짜여야 합니다.")
+            @PastOrPresent(message = "생년원일은 과거 또는 오늘 날짜여야 합니다.")
             @NotNull(message = "생년원일은 필수 입력입니다.")
             @Schema(description = "수정할 사용자 생년월일 (yyyy-MM-dd 형식)", example = "2024-11-20")
             LocalDate birth
