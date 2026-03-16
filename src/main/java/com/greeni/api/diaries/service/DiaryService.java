@@ -21,5 +21,5 @@ public interface DiaryService {
 
     DiaryResponseDTO.CreateDiaryDTO createDiary(Long memberId, DiaryRequestDTO.DiarySaveDTO request);
 
-    void getVoiceUrl(Long id, DiaryRequestDTO.@Valid DiaryUrlDTO request);
+    void getVoiceUrl(Long id, DiaryRequestDTO.DiaryUrlDTO request);
 }
