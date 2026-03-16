@@ -3,6 +3,7 @@ package com.greeni.api.diaries.service;
 import com.greeni.api.diaries.dto.DiaryRequestDTO;
 import com.greeni.api.diaries.dto.DiaryResponseDTO;
 import com.greeni.api.profiles.domain.Profile;
+import jakarta.validation.Valid;
 
 public interface DiaryService {
 
@@ -19,4 +20,6 @@ public interface DiaryService {
     DiaryResponseDTO.DiaryVoiceListDTO getDiaryVoice(int year, int month, int day, Long memberId, Long profileId);
 
     DiaryResponseDTO.CreateDiaryDTO createDiary(Long memberId, DiaryRequestDTO.DiarySaveDTO request);
+
+    void getVoiceUrl(Long id, DiaryRequestDTO.@Valid DiaryUrlDTO request);
 }

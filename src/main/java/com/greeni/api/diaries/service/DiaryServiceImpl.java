@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.greeni.api.activities.converter.ActivityConverter;
 import com.greeni.api.activities.domain.Activity;
@@ -15,6 +16,10 @@ import com.greeni.api.badges.service.BadgeService;
 import com.greeni.api.diaries.converter.VoiceConverter;
 import com.greeni.api.diaries.dto.DiaryRequestDTO;
 import com.greeni.api.profiles.service.ProfileQueryService;
+import jakarta.validation.Valid;
+import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +51,7 @@ public class DiaryServiceImpl implements DiaryService {
     private final VoiceRepository voiceRepository;
 	private final ActivityService activityService;
 	private final BadgeService badgeService;
+	private final RedisTemplate<String, Object> redistemplate;
 
 	// 오늘의 일기 키워드 조회
 	@Override
@@ -191,6 +197,20 @@ public class DiaryServiceImpl implements DiaryService {
 		badgeService.checkAndAwardBadge(profile, ActivityType.DIARY);
 
 		return DiaryConverter.toCreateDiaryDTO(diary.getId());
+	}
+
+	@Override
+	public void getVoiceUrl(Long memberId, DiaryRequestDTO.DiaryUrlDTO request) {
+		// 프로필 존재 확인
+		Profile profile = profileQueryService.findProfileAndValidate(request.profileId(), memberId);
+
+		// redis에 일기 url 저장하기
+		ListOperations<String, Object> ops = redistemplate.opsForList();
+		String key = "diary:voice:" + memberId + ":" + request.profileId();
+		ops.rightPush(key, request.url());
+		if(redistemplate.getExpire(key) == -1) {
+			redistemplate.expire(key, 1, TimeUnit.HOURS);
+		}
 	}
 
 }

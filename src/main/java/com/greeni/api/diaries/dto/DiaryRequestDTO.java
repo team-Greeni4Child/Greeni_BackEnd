@@ -49,4 +49,8 @@ public class DiaryRequestDTO {
         String role;
     }
 
+    public record DiaryUrlDTO(
+        @NotNull
+        String url, @NotNull Long profileId){}
+
 }
