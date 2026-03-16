@@ -51,7 +51,7 @@ public class DiaryServiceImpl implements DiaryService {
     private final VoiceRepository voiceRepository;
 	private final ActivityService activityService;
 	private final BadgeService badgeService;
-	private final RedisTemplate<String, Object> redistemplate;
+	private final RedisTemplate<String, String> redistemplate;
 
 	// 오늘의 일기 키워드 조회
 	@Override
@@ -185,7 +185,13 @@ public class DiaryServiceImpl implements DiaryService {
 
 		Diary diary = DiaryConverter.toDiary(request, profile);
 		diaryRepository.save(diary);
-		List<Voice> voiceList = VoiceConverter.toVoice(request.getVoiceList(), request.getSessionId(), diary);
+		ListOperations<String, String> ops = redistemplate.opsForList();
+		String key = "diary:voice:" + memberId + ":" + request.getProfileId();
+		List<String> urls = ops.range(key, 0, -1);
+		if(urls.isEmpty()){
+			throw new GeneralException(DiaryErrorStatus.NOT_DIARY_VOICE);
+		}
+		List<Voice> voiceList = VoiceConverter.toVoice(urls, request.getSessionId(), diary);
 		voiceRepository.saveAll(voiceList);
 
 		String description = "일기 작성을 완료했습니다.";
@@ -205,9 +211,10 @@ public class DiaryServiceImpl implements DiaryService {
 		Profile profile = profileQueryService.findProfileAndValidate(request.profileId(), memberId);
 
 		// redis에 일기 url 저장하기
-		ListOperations<String, Object> ops = redistemplate.opsForList();
+		ListOperations<String, String> ops = redistemplate.opsForList();
 		String key = "diary:voice:" + memberId + ":" + request.profileId();
-		ops.rightPush(key, request.url());
+		String value = request.role() + "|" + request.url();
+		ops.rightPush(key, value);
 		if(redistemplate.getExpire(key) == -1) {
 			redistemplate.expire(key, 1, TimeUnit.HOURS);
 		}
