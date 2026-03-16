@@ -1,8 +1,15 @@
 package com.greeni.api.members.service;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import com.greeni.api.apiPayload.status.TermErrorStatus;
+import com.greeni.api.members.converter.MemberTermConverter;
+import com.greeni.api.members.domain.Term;
+import com.greeni.api.members.domain.mapping.MemberTerm;
+import com.greeni.api.members.repository.MemberTermRepository;
+import com.greeni.api.members.repository.TermRepository;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -34,6 +41,8 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberServiceImpl implements MemberService {
 
 	private final MemberRepository memberRepository;
+	private final TermRepository termRepository;
+	private final MemberTermRepository memberTermRepository;
 	private final JavaMailSender javaMailSender;
 	private final RedisTemplate<String, Object> redistemplate;
 	private final PasswordEncoder passwordEncoder;
@@ -47,18 +56,31 @@ public class MemberServiceImpl implements MemberService {
 
 		// 이메일 인증 완료 여부 확인
 		checkEmailCode(request.getEmail(), request.getCode());
-		//        ValueOperations<String, Object> ops = redistemplate.opsForValue();
-		//        String codeNum = (String) ops.get("EmailCode"+request.getEmail());
-		//        if(codeNum == null){
-		//            throw new GeneralException(ErrorStatus.EXPIRED_CODE);
-		//        }
-		//        if(!codeNum.equals(request.getCode())){
-		//            throw new GeneralException(ErrorStatus.WRONG_CODE);
-		//        }
 
 		Member member = MemberConverter.toMember(request);
 		member.encodePassword(passwordEncoder.encode(member.getPassword()));
 		memberRepository.save(member);
+
+		if(request.isGuardianConsent()){
+			Term guardianConsent = termRepository.findById(1L)
+					.orElseThrow(() -> new GeneralException(TermErrorStatus.TERM_NOT_FOUND));
+			MemberTerm guardianConsentAndMember = MemberTermConverter.toMemberTerm(member, guardianConsent);
+			memberTermRepository.save(guardianConsentAndMember);
+		}
+
+		if(request.isPersonalInfoConsent()){
+			Term personalInfoConsent = termRepository.findById(2L)
+					.orElseThrow(() -> new GeneralException(TermErrorStatus.TERM_NOT_FOUND));
+			MemberTerm personalInfoConsentAndMember = MemberTermConverter.toMemberTerm(member, personalInfoConsent);
+			memberTermRepository.save(personalInfoConsentAndMember);
+		}
+
+		if(request.isTermsAgreement()){
+			Term termsAgreement = termRepository.findById(3L)
+					.orElseThrow(() -> new GeneralException(TermErrorStatus.TERM_NOT_FOUND));
+			MemberTerm termsAgreementAndMember = MemberTermConverter.toMemberTerm(member, termsAgreement);
+			memberTermRepository.save(termsAgreementAndMember);
+		}
 
 		return MemberConverter.toMemberResultDTO(member);
 	}
