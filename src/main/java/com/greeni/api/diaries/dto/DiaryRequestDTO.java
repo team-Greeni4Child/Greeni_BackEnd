@@ -28,16 +28,13 @@ public class DiaryRequestDTO {
         String summary;
 
         @NotNull
-        List<VoiceDTO> voiceList;
-
-        @NotNull
         String emotion;
 
         @NotNull
         String keyword;
     }
 
-    @Builder
+    /*@Builder
     @AllArgsConstructor
     @Getter
     @NoArgsConstructor
@@ -47,10 +44,10 @@ public class DiaryRequestDTO {
 
         @NotNull
         String role;
-    }
+    }*/
 
     public record DiaryUrlDTO(
         @NotNull
-        String url, @NotNull Long profileId){}
+        String url, @NotNull Long profileId, @NotNull String role){}
 
 }
