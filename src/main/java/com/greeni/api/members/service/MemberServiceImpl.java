@@ -1,7 +1,10 @@
 package com.greeni.api.members.service;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.greeni.api.apiPayload.status.TermErrorStatus;
@@ -61,26 +64,26 @@ public class MemberServiceImpl implements MemberService {
 		member.encodePassword(passwordEncoder.encode(member.getPassword()));
 		memberRepository.save(member);
 
-		if(request.isGuardianConsent()){
-			Term guardianConsent = termRepository.findById(1L)
-					.orElseThrow(() -> new GeneralException(TermErrorStatus.TERM_NOT_FOUND));
-			MemberTerm guardianConsentAndMember = MemberTermConverter.toMemberTerm(member, guardianConsent);
-			memberTermRepository.save(guardianConsentAndMember);
+		// 필수 약관 동의 여부 확인
+		List<Long> requiredTrueIds = termRepository.findRequiredTermIds();
+		Set<Long> requestRequiredIds = new HashSet<>(request.getRequiredAgreement());
+		if(!requestRequiredIds.containsAll(requiredTrueIds)){
+			throw new GeneralException(TermErrorStatus.MISSING_NECESSARY_TERM);
 		}
 
-		if(request.isPersonalInfoConsent()){
-			Term personalInfoConsent = termRepository.findById(2L)
+		for(Long requiredId : request.getRequiredAgreement()){
+			Term termsAgreement = termRepository.findById(requiredId)
 					.orElseThrow(() -> new GeneralException(TermErrorStatus.TERM_NOT_FOUND));
-			MemberTerm personalInfoConsentAndMember = MemberTermConverter.toMemberTerm(member, personalInfoConsent);
-			memberTermRepository.save(personalInfoConsentAndMember);
+			MemberTerm memberTerm = MemberTermConverter.toMemberTerm(member, termsAgreement);
+			memberTermRepository.save(memberTerm);
 		}
 
-		if(request.isTermsAgreement()){
-			Term termsAgreement = termRepository.findById(3L)
-					.orElseThrow(() -> new GeneralException(TermErrorStatus.TERM_NOT_FOUND));
-			MemberTerm termsAgreementAndMember = MemberTermConverter.toMemberTerm(member, termsAgreement);
-			memberTermRepository.save(termsAgreementAndMember);
-		}
+//		if(request.isTermsAgreement()){
+//			Term termsAgreement = termRepository.findById(3L)
+//					.orElseThrow(() -> new GeneralException(TermErrorStatus.TERM_NOT_FOUND));
+//			MemberTerm termsAgreementAndMember = MemberTermConverter.toMemberTerm(member, termsAgreement);
+//			memberTermRepository.save(termsAgreementAndMember);
+//		}
 
 		return MemberConverter.toMemberResultDTO(member);
 	}
