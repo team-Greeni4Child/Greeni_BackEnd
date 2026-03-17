@@ -1,12 +1,11 @@
 package com.greeni.api.members.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 public class MemberRequestDTO {
 
@@ -35,14 +34,9 @@ public class MemberRequestDTO {
 		@Schema(description = "이메일로 전송된 인증번호", example = "123456")
 		private String code;
 
-		@NotNull(message = "14세 미만 법정 대리인 동의는 필수입니다")
-		private boolean guardianConsent;
+		@NotEmpty
+		private List<Long> requiredAgreement;
 
-		@NotNull(message = "개인정보 수집 및 이용 동의는 필수입니다")
-		private boolean personalInfoConsent;
-
-		@NotNull(message = "이용 약관 동의는 필수입니다")
-		private boolean termsAgreement;
 	}
 
 	@Getter
