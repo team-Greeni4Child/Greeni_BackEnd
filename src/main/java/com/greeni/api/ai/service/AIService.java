@@ -15,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import com.greeni.api.ai.domain.Purpose;
+import com.greeni.api.ai.domain.RolePlayingType;
 import com.greeni.api.ai.dto.AIRequestDTO;
 import com.greeni.api.ai.dto.AIResponseDTO;
 import com.greeni.api.apiPayload.handler.GeneralException;
@@ -69,7 +70,7 @@ public class AIService {
 							})
 							.map(audioBytes -> {
 								String base64Audio = Base64.getEncoder().encodeToString(audioBytes);
-								return new AIResponseDTO.HintData(hintText, base64Audio);
+								return new AIResponseDTO.TextVoiceData(hintText, base64Audio);
 							});
 					})
 					.collectList()
@@ -140,12 +141,71 @@ public class AIService {
 	public Mono<AIResponseDTO.RolePlayingResponse> rolePlaying(AIRequestDTO.RolePlaying request) {
 
 		Purpose purpose = Purpose.ROLEPLAY;
+		RolePlayingType type = RolePlayingType.valueOf(request.role().toUpperCase());
+
+		MultipartBodyBuilder builder = new MultipartBodyBuilder();
+
+		try {
+			byte[] voiceBytes = request.voice().getBytes();
+			String originalFileName = request.voice().getOriginalFilename();
+
+			if (originalFileName == null || originalFileName.isEmpty()) {
+				originalFileName = "audio.mp4";
+			}
+
+			builder.part("voice", new ByteArrayResource(voiceBytes))
+				.filename(originalFileName)
+				.contentType(MediaType.parseMediaType("audio/mp4"));
+		} catch (IOException e) {
+			throw new GeneralException(CommonErrorStatus.VOICE_PARSING_ERROR);
+		}
+		builder.part("purpose", purpose.getName());
+		if (request.sessionId() != null) {
+			builder.part("session_id", request.sessionId());
+		}
 
 		return aiWebClient.post()
-			.uri("/chat/roleplay")
-			.bodyValue(request)
+			.uri("/stt/transcribe")
+			.body(BodyInserters.fromMultipartData(builder.build()))
 			.retrieve()
-			.bodyToMono(AIResponseDTO.RolePlayingResponse.class);
+			.bodyToMono(AIResponseDTO.STTResponse.class)
+			.doOnError(WebClientResponseException.class, e -> {
+				log.error("STT 에러: {}", e.getResponseBodyAsString());
+			})
+			.flatMap(sttRes -> {
+				String recognizedText = sttRes.text();
+				log.debug("아이가 한 말: {}", recognizedText);
+
+				AIRequestDTO.RolePlayingInner rolePlayingReq = new AIRequestDTO.RolePlayingInner(
+					request.sessionId(), type, recognizedText, null, null, null
+				);
+
+				return aiWebClient.post()
+					.uri("/chat/roleplay")
+					.bodyValue(rolePlayingReq)
+					.retrieve()
+					.bodyToMono(AIResponseDTO.RolePlayingInnerResponse.class)
+					.doOnError(e -> log.error("RolePlaying 에러: {}", e.getMessage()))
+					.flatMap(roleRes -> {
+						AIRequestDTO.TTSRequest ttsRequest = new AIRequestDTO.TTSRequest(
+							purpose, roleRes.reply(), null, null, null
+						);
+						return aiWebClient.post()
+							.uri("/tts/speak")
+							.bodyValue(ttsRequest)
+							.retrieve()
+							.bodyToMono(byte[].class)
+							.doOnError(WebClientResponseException.class, e -> {
+								log.error("TTS 에러: {}", e.getResponseBodyAsString());
+							})
+							.map(audioBytes -> {
+								String base64Audio = Base64.getEncoder().encodeToString(audioBytes);
+								return AIResponseDTO.RolePlayingResponse.of(
+									request.sessionId(), base64Audio, roleRes.reply(), roleRes.turn()
+								);
+							});
+					});
+			});
 	}
 
 	public Mono<AIResponseDTO.RolePlayingEndResponse> rolePlayingClose(AIRequestDTO.RolePlayingEnd request) {
@@ -153,6 +213,7 @@ public class AIService {
 			.uri("/chat/roleplay/close")
 			.bodyValue(request)
 			.retrieve()
-			.bodyToMono(AIResponseDTO.RolePlayingEndResponse.class);
+			.bodyToMono(AIResponseDTO.RolePlayingEndResponse.class)
+			.map(result -> AIResponseDTO.RolePlayingEndResponse.of(request.sessionId()));
 	}
 }

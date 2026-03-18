@@ -51,7 +51,7 @@ public interface AIControllerDocs {
 			content = @Content(mediaType = "application/json", schema = @Schema(implementation = AIResponseDTO.RolePlayingResponse.class))),
 	})
 	Mono<ResponseEntity<CommonResponse<AIResponseDTO.RolePlayingResponse>>> rolePlayingRequest(
-		@Valid @RequestBody AIRequestDTO.RolePlaying request);
+		@Valid @ModelAttribute AIRequestDTO.RolePlaying request);
 
 	@Operation(
 		summary = "AI: 역할놀이 대화 종료",

@@ -24,6 +24,9 @@ public enum CommonErrorStatus implements ErrorReason {
 
 	// 음성 파일 관련
 	VOICE_PARSING_ERROR(HttpStatus.BAD_REQUEST, "VOICE4001", "음성 파일을 읽는 중 오류가 발생했습니다."),
+
+	// AI Enum 관련
+	NOT_SUPPORTED_ROLE_PLAYING_TYPE(HttpStatus.BAD_REQUEST, "ENUM4001", "지원하지 않는 역할놀이 타입입니다."),
 	;
 
 	private final HttpStatus httpStatus;

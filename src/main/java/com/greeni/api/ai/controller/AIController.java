@@ -42,7 +42,7 @@ public class AIController implements AIControllerDocs {
 	}
 
 	@Override
-	@PostMapping("/role-playing")
+	@PostMapping(value = "/role-playing", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public Mono<ResponseEntity<CommonResponse<AIResponseDTO.RolePlayingResponse>>> rolePlayingRequest(
 		AIRequestDTO.RolePlaying request) {
 		return aiService.rolePlaying(request)

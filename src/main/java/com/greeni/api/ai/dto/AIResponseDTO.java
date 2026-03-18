@@ -46,9 +46,9 @@ public class AIResponseDTO {
 	}
 
 	@Builder
-	public record HintData(
+	public record TextVoiceData(
 		@Schema(description = "힌트 텍스트")
-		String hintText,
+		String text,
 		@Schema(description = "Base64로 인코딩된 TTS 음성 파일")
 		String audioBase64
 	) {
@@ -62,7 +62,7 @@ public class AIResponseDTO {
 
 	@Builder
 	public record FiveQuestionsHintResponse(
-		List<HintData> hints,
+		List<TextVoiceData> hints,
 		String sessionId
 	) {
 	}
@@ -91,15 +91,32 @@ public class AIResponseDTO {
 	}
 
 	@Builder
+	public record RolePlayingInnerResponse(
+		String sessionId,
+		String reply,
+		Integer turn
+	) {
+		public static RolePlayingInnerResponse of(String sessionId, String reply, Integer turn) {
+			return RolePlayingInnerResponse.builder()
+				.sessionId(sessionId)
+				.reply(reply)
+				.turn(turn)
+				.build();
+		}
+	}
+
+	@Builder
 	public record RolePlayingResponse(
 		String sessionId,
 		String base64Voice,
+		String text,
 		Integer turn
 	) {
-		public static RolePlayingResponse of(String sessionId, String base64Voice, Integer turn) {
+		public static RolePlayingResponse of(String sessionId, String base64Voice, String text, Integer turn) {
 			return RolePlayingResponse.builder()
 				.sessionId(sessionId)
 				.base64Voice(base64Voice)
+				.text(text)
 				.turn(turn)
 				.build();
 		}
