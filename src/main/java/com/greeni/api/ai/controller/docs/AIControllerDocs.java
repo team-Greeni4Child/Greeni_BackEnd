@@ -25,7 +25,7 @@ public interface AIControllerDocs {
 	)
 	@ApiResponses({
 		@ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다..",
-			content = @Content(mediaType = "application/json", schema = @Schema(implementation = AIResponseDTO.class))),
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = AIResponseDTO.FiveQuestionsHintResponse.class))),
 	})
 	Mono<ResponseEntity<CommonResponse<AIResponseDTO.FiveQuestionsHintResponse>>> fiveQuestionsHint(
 		@Valid @RequestBody AIRequestDTO.FiveQuestionsHint request);
@@ -36,7 +36,7 @@ public interface AIControllerDocs {
 	)
 	@ApiResponses({
 		@ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다..",
-			content = @Content(mediaType = "application/json", schema = @Schema(implementation = AIResponseDTO.class))),
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = AIResponseDTO.FiveQuestionsCheckResponse.class))),
 	})
 	Mono<ResponseEntity<CommonResponse<AIResponseDTO.FiveQuestionsCheckResponse>>> fiveQuestionsCheck(
 		@Valid @RequestBody AIRequestDTO.FiveQuestionsCheck request);
@@ -47,7 +47,7 @@ public interface AIControllerDocs {
 	)
 	@ApiResponses({
 		@ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다..",
-			content = @Content(mediaType = "application/json", schema = @Schema(implementation = AIResponseDTO.class))),
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = AIResponseDTO.RolePlayingResponse.class))),
 	})
 	Mono<ResponseEntity<CommonResponse<AIResponseDTO.RolePlayingResponse>>> rolePlayingRequest(
 		@Valid @RequestBody AIRequestDTO.RolePlaying request);
@@ -58,7 +58,7 @@ public interface AIControllerDocs {
 	)
 	@ApiResponses({
 		@ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다..",
-			content = @Content(mediaType = "application/json", schema = @Schema(implementation = AIResponseDTO.class))),
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = AIResponseDTO.RolePlayingEndResponse.class))),
 	})
 	Mono<ResponseEntity<CommonResponse<AIResponseDTO.RolePlayingEndResponse>>> rolePlayingCloseRequest(
 		@Valid @RequestBody AIRequestDTO.RolePlayingEnd request);
