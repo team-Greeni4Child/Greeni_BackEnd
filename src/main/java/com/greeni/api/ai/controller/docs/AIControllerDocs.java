@@ -1,6 +1,7 @@
 package com.greeni.api.ai.controller.docs;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.greeni.api.ai.dto.AIRequestDTO;
@@ -39,7 +40,7 @@ public interface AIControllerDocs {
 			content = @Content(mediaType = "application/json", schema = @Schema(implementation = AIResponseDTO.FiveQuestionsCheckResponse.class))),
 	})
 	Mono<ResponseEntity<CommonResponse<AIResponseDTO.FiveQuestionsCheckResponse>>> fiveQuestionsCheck(
-		@Valid @RequestBody AIRequestDTO.FiveQuestionsCheck request);
+		@Valid @ModelAttribute AIRequestDTO.FiveQuestionsCheck request);
 
 	@Operation(
 		summary = "AI: 역할놀이 대화 요청",

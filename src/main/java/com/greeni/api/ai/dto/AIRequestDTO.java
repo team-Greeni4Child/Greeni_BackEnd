@@ -60,13 +60,25 @@ public class AIRequestDTO {
 	}
 
 	public record FiveQuestionsCheck(
-		@NotBlank(message = "필수 입력입니다.")
-		@Schema(description = "Child utterance (from STT)", example = "얼룩말이야.")
-		String utterance,
-
 		@NotNull(message = "필수 입력입니다.")
 		@Schema(description = "음성 파일", example = "")
 		MultipartFile voice,
+
+		@NotBlank(message = "필수 입력입니다.")
+		@Schema(description = "Target word", example = "얼룩말")
+		String answer,
+
+		@Schema(description = "Session Identifier", example = "039D8*&6d")
+		@JsonProperty("session_id")
+		String sessionId
+	) {
+	}
+
+	public record FiveQuestionsCheckInner(
+
+		@NotBlank(message = "필수 입력입니다.")
+		@Schema(description = "Child utterance (from STT)", example = "얼룩말이야.")
+		String utterance,
 
 		@NotBlank(message = "필수 입력입니다.")
 		@Schema(description = "Target word", example = "얼룩말")

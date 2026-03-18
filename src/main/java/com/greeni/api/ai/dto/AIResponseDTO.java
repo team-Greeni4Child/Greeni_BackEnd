@@ -2,6 +2,8 @@ package com.greeni.api.ai.dto;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
@@ -10,6 +12,7 @@ public class AIResponseDTO {
 	@Builder
 	public record STTResponse(
 		String text,
+		@JsonProperty("audio_url")
 		String audioUrl
 	) {
 		public static STTResponse of(String text, String audioUrl) {
@@ -65,12 +68,22 @@ public class AIResponseDTO {
 	}
 
 	@Builder
+	public record FiveQuestionsCheckAnswer(
+		Boolean correct
+	) {
+	}
+
+	@Builder
 	public record FiveQuestionsCheckResponse(
 		String answerCheckVoiceUrl,
+		String answer,
+		Boolean correct,
 		String sessionId
 	) {
 		public static FiveQuestionsCheckResponse of(Boolean correct, String sessionId) {
 			return FiveQuestionsCheckResponse.builder()
+				.correct(correct)
+				.answer(correct ? "" : "")
 				.answerCheckVoiceUrl(correct ? "" : "")
 				.sessionId(sessionId)
 				.build();
