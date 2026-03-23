@@ -36,7 +36,7 @@ public class AIService {
 
 	public Mono<AIResponseDTO.FiveQuestionsHintResponse> fiveQuestionsHint(AIRequestDTO.FiveQuestionsHint request) {
 
-		Purpose purpose = Purpose.GAME;
+		Purpose purpose = Purpose.FIVEQ;
 
 		return aiWebClient.post()
 			.uri("/game/fiveq/hint")
@@ -83,7 +83,7 @@ public class AIService {
 
 	public Mono<AIResponseDTO.FiveQuestionsCheckResponse> fiveQuestionsCheck(AIRequestDTO.FiveQuestionsCheck request) {
 
-		Purpose purpose = Purpose.GAME;
+		Purpose purpose = Purpose.FIVEQ;
 
 		MultipartBodyBuilder builder = new MultipartBodyBuilder();
 

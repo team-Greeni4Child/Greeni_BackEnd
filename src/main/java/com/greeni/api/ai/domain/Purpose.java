@@ -13,8 +13,8 @@ public enum Purpose {
 	DIARY("diary"),
 	@JsonProperty("roleplay")
 	ROLEPLAY("roleplay"),
-	@JsonProperty("game")
-	GAME("game");
+	@JsonProperty("fiveq")
+	FIVEQ("fiveq");
 
 	private final String name;
 }
