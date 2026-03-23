@@ -22,6 +22,7 @@ import com.greeni.api.security.jwt.filter.JwtExceptionHandlerFilter;
 import com.greeni.api.security.jwt.handler.JwtAccessDeniedHandler;
 import com.greeni.api.security.jwt.handler.JwtAuthenticationEntryPoint;
 
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -49,6 +50,7 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.csrf(AbstractHttpConfigurer::disable)
 			.authorizeHttpRequests(auth -> auth
+				.dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
 				.requestMatchers("/api/members/signup", "/api/members/email", "/api/members/password",
 					"/api/members/password/reset", "/api/auth/login", "/api/auth/reissue").permitAll()
 				.requestMatchers(AUTH_WHITELIST).permitAll()

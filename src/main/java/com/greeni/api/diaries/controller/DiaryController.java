@@ -62,4 +62,5 @@ public class DiaryController implements DiaryControllerDocs {
         DiaryResponseDTO.CreateDiaryDTO result = diaryService.createDiary(customUserDetails.getId(), request);
         return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
     }
+
 }

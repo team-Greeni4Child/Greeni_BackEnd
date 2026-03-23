@@ -59,4 +59,6 @@ public class MemberController implements MemberControllerDocs {
 		memberService.checkParentPassword(parentPasswordRequest, userDetails);
 		return ResponseEntity.ok().body(CommonResponse.onSuccess(null));
 	}
+
+
 }
