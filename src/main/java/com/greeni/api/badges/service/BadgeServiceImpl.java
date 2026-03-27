@@ -35,6 +35,7 @@ public class BadgeServiceImpl implements BadgeService {
 	private final ActivityRepository activityRepository;
 	private final BadgeRepository badgeRepository;
 
+	// 프로필의 획득 배지 목록 조회
 	@Override
 	public BadgeResponseDTO.GetBadgeListResponse getBadgeList(Long memberId, Long profileId) {
 		// Profile 엔티티 조회
@@ -53,17 +54,20 @@ public class BadgeServiceImpl implements BadgeService {
 		return BadgeConverter.toGetBadgeListResponseDTO(badges);
 	}
 
+	// 프로필과 활동요약 타입으로 배지를 얻을 수 있는지 조회
 	@Override
 	@Transactional
 	public void checkAndAwardBadge(Profile profile, ActivityType activityType) {
 
 		long currentCount = getCountByActivityType(profile, activityType);
 
+		// 배지 획득 조건에 맞는 경우 배지 획득
 		if (BADGE_THRESHOLDS.contains((int)currentCount)) {
 			awardBadge(profile, activityType, (int)currentCount);
 		}
 	}
 
+	// 활동요약 타입에 따른 개수 확인 및 반환
 	private long getCountByActivityType(Profile profile, ActivityType activityType) {
 		return switch (activityType) {
 			case BADGE -> profileBadgeRepository
@@ -75,16 +79,20 @@ public class BadgeServiceImpl implements BadgeService {
 		};
 	}
 
+	// 배지 획득
 	private void awardBadge(Profile profile, ActivityType activityType, int count) {
 
+		// 배지 이름 생성
 		String badgeName = generateBadgeName(activityType, count);
 
+		// 배지 이름 검증
 		Badge badge = badgeRepository.findByName(badgeName)
 			.orElseThrow(() -> new GeneralException(BadgeErrorStatus.BADGE_NOT_FOUND));
 
+		// 획득하지 않은 배지라면 설명과 활동요약 생성 및 프로필 배지 저장
 		boolean alreadyHas = profileBadgeRepository.existsByProfileAndBadge(profile, badge);
 		if (!alreadyHas) {
-			String description = badgeName + "배지를 획득했어요.";
+			String description = "[" + badgeName + "] 배지를 획득했어요.";
 			activityRepository.save(ActivityConverter.toActivity(ActivityType.BADGE, description, profile, badgeName));
 
 			ProfileBadge profileBadge = ProfileBadge.builder()
@@ -95,6 +103,7 @@ public class BadgeServiceImpl implements BadgeService {
 		}
 	}
 
+	// 배지 이름 생성
 	private String generateBadgeName(ActivityType activityType, int count) {
 		return switch (activityType) {
 			case ATTENDANCE -> count + "일 출석";

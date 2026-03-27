@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.greeni.api.profiles.service.ProfileQueryService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,9 +21,9 @@ import com.greeni.api.activities.repository.ActivityRepository;
 import com.greeni.api.apiPayload.handler.GeneralException;
 import com.greeni.api.apiPayload.status.ProfileErrorStatus;
 import com.greeni.api.badges.service.BadgeService;
-import com.greeni.api.diaries.service.DiaryService;
 import com.greeni.api.profiles.domain.Profile;
 import com.greeni.api.profiles.repository.ProfileRepository;
+import com.greeni.api.profiles.service.ProfileQueryService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -89,12 +88,15 @@ public class ActivityServiceImpl implements ActivityService {
 		return ActivityConverter.toGetDailyActivityListResponseDTO(days, nextCursorCreatedAt, nextCursorId, hasNext);
 	}
 
+	// 일일 활동 요약 목록 조회
 	@Override
 	@Transactional(readOnly = true)
 	public ActivityResponseDTO.DailyList getDailyActivityList(Long memberId, Long profileId) {
 
+		// 프로필 추출 및 검증
 		Profile profile = profileQueryService.findProfileAndValidate(profileId, memberId);
 
+		// 오늘 날짜 추출
 		LocalDate today = LocalDate.now();
 		LocalDateTime startTime = today.atStartOfDay();
 		LocalDateTime endTime = today.atTime(LocalTime.MAX);
@@ -105,52 +107,66 @@ public class ActivityServiceImpl implements ActivityService {
 		return ActivityConverter.toDailyActivityListResponseDTO(activityList);
 	}
 
+	// 다섯고개 활동요약 생성
 	@Override
 	public ActivityResponseDTO.ActivityCreateResponse createFiveQuestionsActivity(Long memberId,
 		ActivityRequestDTO.FiveQuestionCreateRequest request) {
 
+		// 프로필 추출 및 검증
 		Profile profile = profileQueryService.findProfileAndValidate(request.profileId(), memberId);
 
+		// description과 새 활동요약 생성
 		String description =
 			request.count() == 0 ? "다섯고개에서 정답을 맞히지 못했어요." : "다섯고개에서 " + request.count() + "턴만에 정답을 맞혔어요.";
 		Activity newActivity = ActivityConverter.toActivity(
 			ActivityType.FIVE_QUESTIONS, description, profile, null
 		);
 
+		// 오늘의 첫 활동요약인지 확인하고 저장
 		checkTodayActivity(profile);
 		activityRepository.save(newActivity);
 
+		// 다섯고개 배지 확인
 		badgeService.checkAndAwardBadge(profile, ActivityType.FIVE_QUESTIONS);
 
 		return ActivityConverter.toActivityCreateResponseDTO(newActivity);
 	}
 
+	// 역할놀이 활동요약 생성
 	@Override
 	public ActivityResponseDTO.ActivityCreateResponse createRolePlayingActivity(Long memberId,
 		ActivityRequestDTO.RolePlayingCreateRequest request) {
 
+		// 프로필 추출 및 검증
 		Profile profile = profileQueryService.findProfileAndValidate(request.profileId(), memberId);
 
-		String description = "역할놀이에서 " + request.roleName().getName() + "역할을 맡았어요.";
+		// description과 새 활동요약 생성
+		String description = "역할놀이에서 " + request.roleName().getName() + " 역할을 맡았어요.";
 		Activity newActivity = ActivityConverter.toActivity(
 			ActivityType.ROLE_PLAYING, description, profile, null
 		);
 
+		// 오늘의 첫 활동요약인지 확인하고 저장
 		checkTodayActivity(profile);
 		activityRepository.save(newActivity);
 
+		// 역할놀이 배지 확인
 		badgeService.checkAndAwardBadge(profile, ActivityType.ROLE_PLAYING);
 
 		return ActivityConverter.toActivityCreateResponseDTO(newActivity);
 	}
 
+	// 오늘의 첫 활동요약인지 확인
 	@Override
 	public void checkTodayActivity(Profile profile) {
 
+		// 오늘 날짜 추출
 		LocalDate today = LocalDate.now();
 		LocalDateTime startTime = today.atStartOfDay();
 		LocalDateTime endTime = today.atTime(LocalTime.MAX);
 
+		// 프로필 기준 오늘 날짜에 활동요약이 존재하지 않는다면
+		// 출석 일수 증가 및 출석 배지 확인
 		if (!activityRepository.existsByProfileAndCreatedAtBetween(profile, startTime, endTime)) {
 			profile.attend();
 			badgeService.checkAndAwardBadge(profile, ActivityType.ATTENDANCE);
