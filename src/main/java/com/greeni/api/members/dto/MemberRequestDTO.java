@@ -1,11 +1,11 @@
 package com.greeni.api.members.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 public class MemberRequestDTO {
 
@@ -33,6 +33,10 @@ public class MemberRequestDTO {
 		@NotBlank(message = "인증 코드는 필수 입력입니다.")
 		@Schema(description = "이메일로 전송된 인증번호", example = "123456")
 		private String code;
+
+		@NotEmpty
+		private List<Long> requiredAgreement;
+
 	}
 
 	@Getter

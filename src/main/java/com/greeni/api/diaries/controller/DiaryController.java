@@ -63,4 +63,11 @@ public class DiaryController implements DiaryControllerDocs {
         return new ResponseEntity<>(CommonResponse.onSuccess(result), HttpStatus.OK);
     }
 
+
+    @PostMapping("/voice")
+    public ResponseEntity<CommonResponse<?>> getVoice(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                      @RequestBody @Valid DiaryRequestDTO.DiaryUrlDTO request){
+        diaryService.getVoiceUrl(customUserDetails.getId(), request);
+        return new ResponseEntity<>(CommonResponse.onSuccess(null), HttpStatus.OK);
+    }
 }
