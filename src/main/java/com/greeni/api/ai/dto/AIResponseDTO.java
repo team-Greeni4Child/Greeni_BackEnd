@@ -68,7 +68,9 @@ public class AIResponseDTO {
 
     @Builder
     public record FiveQuestionsHintInner(
+            @JsonProperty("audio_content")
             String audioContent,
+            @JsonProperty("audio_url")
             String audioUrl
     ) {
     }
