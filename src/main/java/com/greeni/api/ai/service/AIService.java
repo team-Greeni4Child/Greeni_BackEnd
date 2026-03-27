@@ -62,11 +62,11 @@ public class AIService {
                                         .uri("/tts/speak")
                                         .bodyValue(ttsRequest)
                                         .retrieve()
-                                        .bodyToMono(String.class)
+                                        .bodyToMono(AIResponseDTO.FiveQuestionsHintInner.class)
                                         .doOnError(WebClientResponseException.class, e -> {
                                             log.error("TTS 에러: {}", e.getResponseBodyAsString());
                                         })
-                                        .map(base64Audio -> new AIResponseDTO.TextVoiceData(hintText, base64Audio));
+                                        .map(base64Audio -> new AIResponseDTO.TextVoiceData(hintText, base64Audio.audioContent()));
                             })
                             .collectList()
                             .map(hintDataList -> AIResponseDTO.FiveQuestionsHintResponse.builder()
@@ -151,12 +151,12 @@ public class AIService {
                                         .uri("/tts/speak")
                                         .bodyValue(ttsRequest)
                                         .retrieve()
-                                        .bodyToMono(String.class)
+                                        .bodyToMono(AIResponseDTO.FiveQuestionsHintInner.class)
                                         .doOnError(WebClientResponseException.class, e -> {
                                             log.error("TTS 에러: {}", e.getResponseBodyAsString());
                                         })
                                         .map(base64Audio -> AIResponseDTO.RolePlayingResponse.of(
-                                                request.sessionId(), base64Audio, roleRes.reply(), roleRes.turn()
+                                                request.sessionId(), base64Audio.audioContent(), roleRes.reply(), roleRes.turn()
                                         ));
                             });
                 });
@@ -194,6 +194,6 @@ public class AIService {
             builder.part("session_id", sessionId);
         }
 
-		return builder;
+        return builder;
     }
 }
