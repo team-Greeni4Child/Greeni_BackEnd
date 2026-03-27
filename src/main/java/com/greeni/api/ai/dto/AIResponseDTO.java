@@ -67,6 +67,13 @@ public class AIResponseDTO {
     }
 
     @Builder
+    public record FiveQuestionsHintInner(
+            String audioContent,
+            String audioUrl
+    ) {
+    }
+
+    @Builder
     public record FiveQuestionsCheckAnswer(
             Boolean correct
     ) {
