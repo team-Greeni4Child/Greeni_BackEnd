@@ -217,6 +217,7 @@ public class AIService {
             redistemplate.expire(key, 1, TimeUnit.HOURS);
         }
 
+        // 일기 요청 대화 로직
         Purpose purpose = Purpose.DIARY;
 
         MultipartBodyBuilder builder = buildVoiceMultipart(request.voice(), purpose, null);
@@ -233,7 +234,6 @@ public class AIService {
                     String recognizedText = sttRes.text();
                     log.debug("아이가 한 말: {}", recognizedText);
 
-                    // 여기서부터 시작
                     AIRequestDTO.DiaryInner diaryReq = new AIRequestDTO.DiaryInner(
                             request.session_id(), request.user_text()
                     );
@@ -256,6 +256,7 @@ public class AIService {
                                         .doOnError(WebClientResponseException.class, e ->
                                                 log.error("TTS 에러: {}", e.getResponseBodyAsString())
                                         )
+                                        // ai서버로부터 온 s3 url 저장 로직
                                         .map(ttsRes -> {
                                             if (ttsRes.audioUrl() != null) {
                                                 String aiValue = "GREENI|" + ttsRes.audioUrl();
