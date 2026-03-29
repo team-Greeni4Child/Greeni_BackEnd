@@ -1,8 +1,10 @@
 package com.greeni.api.ai.controller;
 
+import com.greeni.api.security.jwt.userDetails.CustomUserDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,4 +58,14 @@ public class AIController implements AIControllerDocs {
 		return aiService.rolePlayingClose(request)
 			.map(dto -> new ResponseEntity<>(CommonResponse.onSuccess(dto), HttpStatus.OK));
 	}
+
+	@Override
+	@PostMapping(value = "/diaries", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public Mono<ResponseEntity<CommonResponse<AIResponseDTO.DiaryResponse>>> diaryRequest(
+			AIRequestDTO.DiaryRequest request,
+			CustomUserDetails customUserDetails){
+		return aiService.diary(request, customUserDetails.getId())
+				.map(dto -> new ResponseEntity<>(CommonResponse.onSuccess(dto), HttpStatus.OK));
+	}
+
 }
