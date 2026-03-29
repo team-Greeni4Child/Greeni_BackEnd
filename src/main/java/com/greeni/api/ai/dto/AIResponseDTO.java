@@ -136,4 +136,37 @@ public class AIResponseDTO {
                     .build();
         }
     }
+
+    @Builder
+    public record DiaryResponse(
+            String sessionId,
+            String base64Voice,
+            String text,
+            Integer turn
+    ){
+        public static DiaryResponse of(String sessionId, String base64Voice, String text, Integer turn) {
+            return DiaryResponse.builder()
+                    .sessionId(sessionId)
+                    .base64Voice(base64Voice)
+                    .text(text)
+                    .turn(turn)
+                    .build();
+        }
+    }
+
+    @Builder
+    public record DiaryInnerResponse(
+            String sessionId,
+            String reply,
+            Integer turn_count,
+            String status
+    ){public static DiaryInnerResponse of(String sessionId, String reply, Integer turn_count) {
+        return DiaryInnerResponse.builder()
+                .sessionId(sessionId)
+                .reply(reply)
+                .turn_count(turn_count)
+                .build();
+        }
+    }
+
 }
