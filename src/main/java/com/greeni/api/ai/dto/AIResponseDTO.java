@@ -23,16 +23,16 @@ public class AIResponseDTO {
         }
     }
 
-    @Builder
-    public record TTSResponse(
-            byte[] audioContent
-    ) {
-        public static TTSResponse of(byte[] audioContent) {
-            return TTSResponse.builder()
-                    .audioContent(audioContent)
-                    .build();
-        }
-    }
+//    @Builder
+//    public record TTSResponse(
+//            byte[] audioContent
+//    ) {
+//        public static TTSResponse of(byte[] audioContent) {
+//            return TTSResponse.builder()
+//                    .audioContent(audioContent)
+//                    .build();
+//        }
+//    }
 
     @Builder
     public record FiveQuestionHintVoice(
@@ -68,7 +68,7 @@ public class AIResponseDTO {
     }
 
     @Builder
-    public record FiveQuestionsHintInner(
+    public record TTSResponse(
             @JsonProperty("audio_content")
             String audioContent,
             @JsonProperty("audio_url")

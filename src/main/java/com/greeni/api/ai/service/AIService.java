@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional()
+@Transactional(readOnly = true)
 public class AIService {
 
     private final WebClient aiWebClient;
@@ -77,7 +77,7 @@ public class AIService {
                                         .uri("/tts/speak")
                                         .bodyValue(ttsRequest)
                                         .retrieve()
-                                        .bodyToMono(AIResponseDTO.FiveQuestionsHintInner.class)
+                                        .bodyToMono(AIResponseDTO.TTSResponse.class)
                                         .doOnError(WebClientResponseException.class, e -> {
                                             log.error("TTS 에러: {}", e.getResponseBodyAsString());
                                         })
@@ -166,7 +166,7 @@ public class AIService {
                                         .uri("/tts/speak")
                                         .bodyValue(ttsRequest)
                                         .retrieve()
-                                        .bodyToMono(AIResponseDTO.FiveQuestionsHintInner.class)
+                                        .bodyToMono(AIResponseDTO.TTSResponse.class)
                                         .doOnError(WebClientResponseException.class, e -> {
                                             log.error("TTS 에러: {}", e.getResponseBodyAsString());
                                         })
@@ -260,7 +260,7 @@ public class AIService {
                                         .uri("/tts/speak")
                                         .bodyValue(ttsRequest)
                                         .retrieve()
-                                        .bodyToMono(AIResponseDTO.FiveQuestionsHintInner.class)
+                                        .bodyToMono(AIResponseDTO.TTSResponse.class)
                                         .doOnError(WebClientResponseException.class, e ->
                                                 log.error("TTS 에러: {}", e.getResponseBodyAsString())
                                         )
@@ -301,6 +301,7 @@ public class AIService {
                 });
     }
 
+    @Transactional
     public Mono<AIResponseDTO.DiaryCloseResponse> diarySummarize(AIRequestDTO.DiarySummarizeRequest request, Long memberId) {
         Profile profile = profileQueryService.findProfileAndValidate(request.profileId(), memberId);
         String key = "diary:voice:" + memberId + ":" + request.profileId();
