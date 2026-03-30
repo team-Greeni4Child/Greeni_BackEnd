@@ -15,6 +15,7 @@ public enum DiaryErrorStatus implements ErrorReason {
     DIARY_NOT_FOUND_TODAY(HttpStatus.NOT_FOUND, "DIARY4041", "오늘 작성된 일기가 없습니다."),
     NOT_VALID_EMOTION(HttpStatus.NOT_FOUND, "DIARY4042", "올바른 감정이 아닙니다."),
     NOT_DIARY_VOICE(HttpStatus.NOT_FOUND, "DIARY4043", "저장할 음성 url이 없습니다."),
+    EXIST_TODAY_DIARY(HttpStatus.NOT_FOUND, "DIARY4044", "오늘 일기가 이미 존재합니다"),
     ;
 
     private final HttpStatus httpStatus;

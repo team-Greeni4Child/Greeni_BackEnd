@@ -6,6 +6,7 @@ import com.greeni.api.ai.dto.AIRequestDTO;
 import com.greeni.api.ai.dto.AIResponseDTO;
 import com.greeni.api.apiPayload.handler.GeneralException;
 import com.greeni.api.apiPayload.status.CommonErrorStatus;
+import com.greeni.api.apiPayload.status.DiaryErrorStatus;
 import com.greeni.api.diaries.domain.Diary;
 import com.greeni.api.diaries.domain.Voice;
 import com.greeni.api.diaries.domain.enums.Emotion;
@@ -216,6 +217,10 @@ public class AIService {
     public Mono<AIResponseDTO.DiaryResponse> diary(AIRequestDTO.DiaryRequest request, Long memberId) {
         // 프론트에서 받은 s3 redis에 저장하는 로직
         Profile profile = profileQueryService.findProfileAndValidate(request.profileId(), memberId);
+
+        if(diaryRepository.findByProfileIdAndDiaryDate(profile.getId(), LocalDate.now()).isPresent()){
+            throw new GeneralException(DiaryErrorStatus.EXIST_TODAY_DIARY);
+        }
 
         ListOperations<String, String> ops = redistemplate.opsForList();
         String key = "diary:voice:" + memberId + ":" + request.profileId();

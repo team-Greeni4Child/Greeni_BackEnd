@@ -20,4 +20,5 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
     List<Diary> findByProfileIdAndCreatedAtGreaterThanEqualAndCreatedAtLessThanOrderByCreatedAtAsc(Long profileId, LocalDateTime start, LocalDateTime end);
 
     Optional<Diary> findByProfileIdAndDiaryDate(Long profileId, LocalDate today);
+
 }
