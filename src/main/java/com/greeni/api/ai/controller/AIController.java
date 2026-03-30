@@ -4,7 +4,6 @@ import com.greeni.api.security.jwt.userDetails.CustomUserDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -68,4 +67,13 @@ public class AIController implements AIControllerDocs {
 				.map(dto -> new ResponseEntity<>(CommonResponse.onSuccess(dto), HttpStatus.OK));
 	}
 
+	@Override
+	@PostMapping(value = "/diaries/close")
+	public Mono<ResponseEntity<CommonResponse<?>>> diaryAbnormalCloseRequest(
+			AIRequestDTO.DiaryCloseRequest request,
+			CustomUserDetails customUserDetails
+	) {
+		return aiService.diaryClose(request, customUserDetails.getId())
+				.map(dto -> new ResponseEntity<>(CommonResponse.onSuccess(dto), HttpStatus.OK));
+	}
 }
