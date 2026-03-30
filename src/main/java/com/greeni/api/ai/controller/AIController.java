@@ -1,5 +1,6 @@
 package com.greeni.api.ai.controller;
 
+import com.greeni.api.security.jwt.userDetails.CustomUserDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -55,5 +56,34 @@ public class AIController implements AIControllerDocs {
 		AIRequestDTO.RolePlayingEnd request) {
 		return aiService.rolePlayingClose(request)
 			.map(dto -> new ResponseEntity<>(CommonResponse.onSuccess(dto), HttpStatus.OK));
+	}
+
+	@Override
+	@PostMapping(value = "/diaries", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public Mono<ResponseEntity<CommonResponse<AIResponseDTO.DiaryResponse>>> diaryRequest(
+			AIRequestDTO.DiaryRequest request,
+			CustomUserDetails customUserDetails){
+		return aiService.diary(request, customUserDetails.getId())
+				.map(dto -> new ResponseEntity<>(CommonResponse.onSuccess(dto), HttpStatus.OK));
+	}
+
+	@Override
+	@PostMapping(value = "/diaries/close")
+	public Mono<ResponseEntity<CommonResponse<?>>> diaryAbnormalCloseRequest(
+			AIRequestDTO.DiaryCloseRequest request,
+			CustomUserDetails customUserDetails
+	) {
+		return aiService.diaryClose(request, customUserDetails.getId())
+				.map(dto -> new ResponseEntity<>(CommonResponse.onSuccess(dto), HttpStatus.OK));
+	}
+
+	@Override
+	@PostMapping(value = "/diaries/summarize")
+	public Mono<ResponseEntity<CommonResponse<AIResponseDTO.DiaryCloseResponse>>> diarySummarizeRequest(
+			AIRequestDTO.DiarySummarizeRequest request,
+			CustomUserDetails customUserDetails
+			){
+		return aiService.diarySummarize(request, customUserDetails.getId())
+				.map(dto -> new ResponseEntity<>(CommonResponse.onSuccess(dto), HttpStatus.OK));
 	}
 }

@@ -1,6 +1,7 @@
 package com.greeni.api.ai.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.greeni.api.diaries.domain.enums.Emotion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
@@ -22,16 +23,16 @@ public class AIResponseDTO {
         }
     }
 
-    @Builder
-    public record TTSResponse(
-            byte[] audioContent
-    ) {
-        public static TTSResponse of(byte[] audioContent) {
-            return TTSResponse.builder()
-                    .audioContent(audioContent)
-                    .build();
-        }
-    }
+//    @Builder
+//    public record TTSResponse(
+//            byte[] audioContent
+//    ) {
+//        public static TTSResponse of(byte[] audioContent) {
+//            return TTSResponse.builder()
+//                    .audioContent(audioContent)
+//                    .build();
+//        }
+//    }
 
     @Builder
     public record FiveQuestionHintVoice(
@@ -67,7 +68,7 @@ public class AIResponseDTO {
     }
 
     @Builder
-    public record FiveQuestionsHintInner(
+    public record TTSResponse(
             @JsonProperty("audio_content")
             String audioContent,
             @JsonProperty("audio_url")
@@ -136,4 +137,72 @@ public class AIResponseDTO {
                     .build();
         }
     }
+
+    @Builder
+    public record DiaryResponse(
+            String sessionId,
+            String base64Voice,
+            String text,
+            Integer turn
+    ){
+        public static DiaryResponse of(String sessionId, String base64Voice, String text, Integer turn) {
+            return DiaryResponse.builder()
+                    .sessionId(sessionId)
+                    .base64Voice(base64Voice)
+                    .text(text)
+                    .turn(turn)
+                    .build();
+        }
+    }
+
+    @Builder
+    public record DiaryInnerResponse(
+            String sessionId,
+            String reply,
+            Integer turn_count,
+            String status
+    ){public static DiaryInnerResponse of(String sessionId, String reply, Integer turn_count) {
+        return DiaryInnerResponse.builder()
+                .sessionId(sessionId)
+                .reply(reply)
+                .turn_count(turn_count)
+                .build();
+        }
+    }
+
+    @Builder
+    public record DiaryCloseResponse(
+      Long diaryId
+    ){
+        public static DiaryCloseResponse of(Long diaryId){
+            return DiaryCloseResponse.builder()
+                    .diaryId(diaryId)
+                    .build();
+        }
+    }
+
+    @Builder
+    public record DiaryAbnormalEndInnerResponse(
+            String sessionId,
+            Integer turn_count,
+            String status
+    ){
+    }
+
+    @Builder
+    public record DiarySummarizeInnerResponse(
+            String sessionId,
+            Integer turn_count,
+            String summary,
+            EmotionResponse emotion,
+            String keyword
+    ){
+    }
+
+    @Builder
+    public record EmotionResponse(
+            String primary,
+            Double confidence
+    ) { }
+
 }

@@ -19,7 +19,7 @@ public interface DiaryService {
 
     DiaryResponseDTO.DiaryVoiceListDTO getDiaryVoice(int year, int month, int day, Long memberId, Long profileId);
 
-    DiaryResponseDTO.CreateDiaryDTO createDiary(Long memberId, DiaryRequestDTO.DiarySaveDTO request);
+    // DiaryResponseDTO.CreateDiaryDTO createDiary(Long memberId, DiaryRequestDTO.DiarySaveDTO request);
 
     void getVoiceUrl(Long id, DiaryRequestDTO.DiaryUrlDTO request);
 }

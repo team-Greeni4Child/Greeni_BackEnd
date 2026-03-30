@@ -155,4 +155,76 @@ public class AIRequestDTO {
 		String sessionId
 	) {
 	}
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	public record DiaryRequest(
+			@NotNull Long profileId,
+			@NotBlank(message = "필수 입력입니다~~")
+			@Schema(description = "Session Identifier", example = "039D8*&6d")
+			@BindParam("session_id")
+			@JsonProperty("session_id")
+			String session_id,
+
+			@NotNull(message = "필수 입력입니다.")
+			@Schema(description = "대화 내용을 s3에 올린 후 url", example = "")
+			String voiceUrl,
+
+			@NotBlank(message = "필수 입력입니다.")
+			@Schema(description = "아이의 음성을 텍스트로 변환한 것", example = "")
+			@JsonProperty("user_text")
+			String user_text,
+
+			@NotNull(message = "필수 입력입니다.")
+			@Schema(description = "음성 파일", example = "")
+			MultipartFile voice
+	){
+	}
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	public record DiaryInner(
+			@NotBlank(message = "필수 입력입니다.")
+			@Schema(description = "Session Identifier", example = "039D8*&6d")
+			@BindParam("session_id")
+			@JsonProperty("session_id")
+			String sessionId,
+			@NotBlank(message = "필수 입력입니다.")
+			@Schema(description = "아이의 음성을 텍스트로 변환한 것", example = "")
+			@JsonProperty("user_text")
+			String userText
+	){
+	}
+
+	public record DiaryCloseRequest(
+			@NotNull Long profileId,
+			@NotBlank(message = "필수 입력입니다.")
+			@Schema(description = "Session Identifier", example = "039D8*&6d")
+			@BindParam("session_id")
+			@JsonProperty("session_id")
+			String sessionId,
+			@NotBlank(message = "필수 입력입니다.")
+			@Schema(description = "대화 비정상 종료", example = "ended")
+			String status
+	){
+	}
+
+	public record DiarySummarizeRequest(
+			@NotNull Long profileId,
+			@Schema(description = "Session Identifier", example = "039D8*&6d")
+			@BindParam("session_id")
+			@JsonProperty("session_id")
+			String sessionId,
+			@NotNull(message = "필수 입력입니다.")
+			@Schema(description = "S3에 올린 그림 일기 또는 사진", example = "")
+			String imageUrl
+	){
+	}
+
+	public record DiarySummarizeInnerRequest(
+			@Schema(description = "Session Identifier", example = "039D8*&6d")
+			@BindParam("session_id")
+			@JsonProperty("session_id")
+			String sessionId
+	){
+	}
+
 }

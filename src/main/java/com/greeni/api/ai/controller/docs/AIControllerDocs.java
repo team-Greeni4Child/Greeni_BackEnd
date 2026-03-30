@@ -1,7 +1,10 @@
 package com.greeni.api.ai.controller.docs;
 
+import com.greeni.api.security.jwt.userDetails.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.greeni.api.ai.dto.AIRequestDTO;
@@ -63,4 +66,41 @@ public interface AIControllerDocs {
 	})
 	Mono<ResponseEntity<CommonResponse<AIResponseDTO.RolePlayingEndResponse>>> rolePlayingCloseRequest(
 		@Valid @RequestBody AIRequestDTO.RolePlayingEnd request);
+
+	@Operation(
+			summary = "AI: 일기 대화 요청",
+			description = "일기: AI에게 대화를 요청하는 API"
+	)
+	@ApiResponses({
+			@ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다..",
+					content = @Content(mediaType = "application/json", schema = @Schema(implementation = AIResponseDTO.DiaryResponse.class))),
+	})
+	Mono<ResponseEntity<CommonResponse<AIResponseDTO.DiaryResponse>>> diaryRequest(
+            @Valid @ModelAttribute AIRequestDTO.DiaryRequest request,
+			@AuthenticationPrincipal CustomUserDetails customUserDetails);
+
+	@Operation(
+			summary = "AI: 일기 대화 비정상 종료",
+			description = "일기: AI에게 대화를 비정상 종료하는 API"
+	)
+	@ApiResponses({
+			@ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다..",
+					content = @Content(mediaType = "application/json", schema = @Schema(implementation = AIResponseDTO.DiaryCloseResponse.class))),
+	})
+	public Mono<ResponseEntity<CommonResponse<?>>> diaryAbnormalCloseRequest(
+			@Valid @ModelAttribute AIRequestDTO.DiaryCloseRequest request,
+			@AuthenticationPrincipal CustomUserDetails customUserDetails);
+
+	@Operation(
+			summary = "AI: 일기 대화 저장",
+			description = "일기: 일기 대화 내용을 저장하는 API"
+	)
+	@ApiResponses({
+			@ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다..",
+					content = @Content(mediaType = "application/json", schema = @Schema(implementation = AIResponseDTO.DiaryCloseResponse.class))),
+	})
+	public Mono<ResponseEntity<CommonResponse<AIResponseDTO.DiaryCloseResponse>>> diarySummarizeRequest(
+			@Valid @ModelAttribute AIRequestDTO.DiarySummarizeRequest request,
+			@AuthenticationPrincipal CustomUserDetails customUserDetails
+	);
 }
