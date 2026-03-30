@@ -275,4 +275,24 @@ public class AIService {
                             });
                 });
     }
+
+    public Mono<?> diaryClose(AIRequestDTO.DiaryCloseRequest request, Long memberId) {
+        // ai에게 대화 종료 요청 (ended)
+        Profile profile = profileQueryService.findProfileAndValidate(request.profileId(), memberId);
+        String key = "diary:voice:" + memberId + ":" + request.profileId();
+        redistemplate.delete(key);
+        return aiWebClient.post()
+                .uri("/diary/end")
+                .bodyValue(request)   // session_id 포함된 DTO
+                .retrieve()
+                .bodyToMono(AIResponseDTO.DiaryAbnormalEndInnerResponse.class)
+                .doOnError(WebClientResponseException.class, e ->
+                        log.error("Diary End 에러: {}", e.getResponseBodyAsString())
+                );
+    }
+
+
+    // ai에게 대화 요약 요청
+
+    // db에 저장 후, 프론트에게 값 돌려주기
 }

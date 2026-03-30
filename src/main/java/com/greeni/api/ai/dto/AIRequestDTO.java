@@ -194,4 +194,17 @@ public class AIRequestDTO {
 	){
 	}
 
+	public record DiaryCloseRequest(
+			@NotNull Long profileId,
+			@NotBlank(message = "필수 입력입니다.")
+			@Schema(description = "Session Identifier", example = "039D8*&6d")
+			@BindParam("session_id")
+			@JsonProperty("session_id")
+			String sessionId,
+			@NotBlank(message = "필수 입력입니다.")
+			@Schema(description = "대화 비정상 종료", example = "ended")
+			String status
+	){
+	}
+
 }

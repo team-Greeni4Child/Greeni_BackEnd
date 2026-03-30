@@ -169,4 +169,16 @@ public class AIResponseDTO {
         }
     }
 
+    public record DiaryCloseResponse(
+      Long diaryId
+    ){
+    }
+
+    public record DiaryAbnormalEndInnerResponse(
+            String sessionId,
+            Integer turn_count,
+            String status
+    ){
+    }
+
 }
