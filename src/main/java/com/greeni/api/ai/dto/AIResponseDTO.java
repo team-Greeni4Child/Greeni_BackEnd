@@ -1,6 +1,7 @@
 package com.greeni.api.ai.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.greeni.api.diaries.domain.enums.Emotion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
@@ -169,16 +170,39 @@ public class AIResponseDTO {
         }
     }
 
+    @Builder
     public record DiaryCloseResponse(
       Long diaryId
     ){
+        public static DiaryCloseResponse of(Long diaryId){
+            return DiaryCloseResponse.builder()
+                    .diaryId(diaryId)
+                    .build();
+        }
     }
 
+    @Builder
     public record DiaryAbnormalEndInnerResponse(
             String sessionId,
             Integer turn_count,
             String status
     ){
     }
+
+    @Builder
+    public record DiarySummarizeInnerResponse(
+            String sessionId,
+            Integer turn_count,
+            String summary,
+            EmotionResponse emotion,
+            String keyword
+    ){
+    }
+
+    @Builder
+    public record EmotionResponse(
+            String primary,
+            Double confidence
+    ) { }
 
 }

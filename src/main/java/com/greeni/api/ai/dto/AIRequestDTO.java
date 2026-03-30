@@ -207,4 +207,24 @@ public class AIRequestDTO {
 	){
 	}
 
+	public record DiarySummarizeRequest(
+			@NotNull Long profileId,
+			@Schema(description = "Session Identifier", example = "039D8*&6d")
+			@BindParam("session_id")
+			@JsonProperty("session_id")
+			String sessionId,
+			@NotNull(message = "필수 입력입니다.")
+			@Schema(description = "S3에 올린 그림 일기 또는 사진", example = "")
+			String imageUrl
+	){
+	}
+
+	public record DiarySummarizeInnerRequest(
+			@Schema(description = "Session Identifier", example = "039D8*&6d")
+			@BindParam("session_id")
+			@JsonProperty("session_id")
+			String sessionId
+	){
+	}
+
 }
