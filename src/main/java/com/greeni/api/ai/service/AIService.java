@@ -280,7 +280,6 @@ public class AIService {
         // ai에게 대화 종료 요청 (ended)
         Profile profile = profileQueryService.findProfileAndValidate(request.profileId(), memberId);
         String key = "diary:voice:" + memberId + ":" + request.profileId();
-        redistemplate.delete(key);
         return aiWebClient.post()
                 .uri("/diary/end")
                 .bodyValue(request)   // session_id 포함된 DTO
@@ -288,7 +287,10 @@ public class AIService {
                 .bodyToMono(AIResponseDTO.DiaryAbnormalEndInnerResponse.class)
                 .doOnError(WebClientResponseException.class, e ->
                         log.error("Diary End 에러: {}", e.getResponseBodyAsString())
-                );
+                )
+                .doOnSuccess(res -> {
+                    redistemplate.delete(key);
+                });
     }
 
 
