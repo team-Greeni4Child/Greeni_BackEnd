@@ -179,31 +179,31 @@ public class DiaryServiceImpl implements DiaryService {
         return requestDate;
     }
 
-	@Override
-	public DiaryResponseDTO.CreateDiaryDTO createDiary(Long memberId, DiaryRequestDTO.DiarySaveDTO request) {
-		Profile profile = profileQueryService.findProfileAndValidate(request.getProfileId(), memberId);
-
-		Diary diary = DiaryConverter.toDiary(request, profile);
-		diaryRepository.save(diary);
-		ListOperations<String, String> ops = redistemplate.opsForList();
-		String key = "diary:voice:" + memberId + ":" + request.getProfileId();
-		List<String> urls = ops.range(key, 0, -1);
-		if(urls.isEmpty()){
-			throw new GeneralException(DiaryErrorStatus.NOT_DIARY_VOICE);
-		}
-		List<Voice> voiceList = VoiceConverter.toVoice(urls, request.getSessionId(), diary);
-		voiceRepository.saveAll(voiceList);
-
-		String description = "일기 작성을 완료했습니다.";
-		Activity newActivity = ActivityConverter.toActivity(
-				ActivityType.DIARY, description, profile, null);
-		activityService.checkTodayActivity(profile);
-		activityRepository.save(newActivity);
-
-		badgeService.checkAndAwardBadge(profile, ActivityType.DIARY);
-
-		return DiaryConverter.toCreateDiaryDTO(diary.getId());
-	}
+//	@Override
+//	public DiaryResponseDTO.CreateDiaryDTO createDiary(Long memberId, DiaryRequestDTO.DiarySaveDTO request) {
+//		Profile profile = profileQueryService.findProfileAndValidate(request.getProfileId(), memberId);
+//
+//		Diary diary = DiaryConverter.toDiary(request, profile);
+//		diaryRepository.save(diary);
+//		ListOperations<String, String> ops = redistemplate.opsForList();
+//		String key = "diary:voice:" + memberId + ":" + request.getProfileId();
+//		List<String> urls = ops.range(key, 0, -1);
+//		if(urls.isEmpty()){
+//			throw new GeneralException(DiaryErrorStatus.NOT_DIARY_VOICE);
+//		}
+//		List<Voice> voiceList = VoiceConverter.toVoice(urls, request.getSessionId(), diary);
+//		voiceRepository.saveAll(voiceList);
+//
+//		String description = "일기 작성을 완료했습니다.";
+//		Activity newActivity = ActivityConverter.toActivity(
+//				ActivityType.DIARY, description, profile, null);
+//		activityService.checkTodayActivity(profile);
+//		activityRepository.save(newActivity);
+//
+//		badgeService.checkAndAwardBadge(profile, ActivityType.DIARY);
+//
+//		return DiaryConverter.toCreateDiaryDTO(diary.getId());
+//	}
 
 	@Override
 	public void getVoiceUrl(Long memberId, DiaryRequestDTO.DiaryUrlDTO request) {
