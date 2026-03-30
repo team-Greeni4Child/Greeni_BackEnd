@@ -6,6 +6,11 @@ import com.greeni.api.ai.dto.AIRequestDTO;
 import com.greeni.api.ai.dto.AIResponseDTO;
 import com.greeni.api.apiPayload.handler.GeneralException;
 import com.greeni.api.apiPayload.status.CommonErrorStatus;
+import com.greeni.api.diaries.domain.Diary;
+import com.greeni.api.diaries.domain.Voice;
+import com.greeni.api.diaries.domain.enums.Emotion;
+import com.greeni.api.diaries.domain.enums.VoiceRole;
+import com.greeni.api.diaries.repository.DiaryRepository;
 import com.greeni.api.profiles.domain.Profile;
 import com.greeni.api.profiles.service.ProfileQueryService;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +28,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +43,7 @@ import java.util.concurrent.TimeUnit;
 public class AIService {
 
     private final WebClient aiWebClient;
+    private final DiaryRepository diaryRepository;
     private final RedisTemplate<String, String> redistemplate;
     private final ProfileQueryService profileQueryService;
 
@@ -293,8 +301,74 @@ public class AIService {
                 });
     }
 
+    public Mono<AIResponseDTO.DiaryCloseResponse> diarySummarize(AIRequestDTO.DiarySummarizeRequest request, Long memberId) {
+        Profile profile = profileQueryService.findProfileAndValidate(request.profileId(), memberId);
+        String key = "diary:voice:" + memberId + ":" + request.profileId();
 
-    // ai에게 대화 요약 요청
+        AIRequestDTO.DiarySummarizeInnerRequest innerReq =
+                new AIRequestDTO.DiarySummarizeInnerRequest(
+                        request.sessionId()
+                );
+        // db에 저장 후, 프론트에게 값 돌려주기
+        // ai에게 대화 요약 요청
+        return aiWebClient.post()
+                .uri("/diary/summarize")
+                .bodyValue(innerReq)
+                .retrieve()
+                .bodyToMono(AIResponseDTO.DiarySummarizeInnerResponse.class)
+                .doOnError(WebClientResponseException.class, e ->
+                        log.error("Diary Summarize 에러: {}", e.getResponseBodyAsString())
+                )
+                .flatMap(aiRes -> {
+                    //  1. Redis에서 voice 리스트 조회
+                    List<String> voiceRawList = redistemplate.opsForList().range(key, 0, -1);
 
-    // db에 저장 후, 프론트에게 값 돌려주기
+                    //  2. Diary 생성
+                    Diary diary = Diary.builder()
+                            .diaryImage(request.imageUrl())
+                            .summary(aiRes.summary())
+                            .emotion(Emotion.from(aiRes.emotion().primary()))
+                            .keyword(aiRes.keyword())
+                            .diaryDate(LocalDate.now())
+                            .profile(profile)
+                            .build();
+
+                    //  3. Voice 변환
+                    if (voiceRawList != null) {
+                        for (String raw : voiceRawList) {
+
+                            String[] parts = raw.split("\\|");
+                            String roleStr = parts[0];
+                            String url = parts[1];
+
+                            Voice voice = Voice.builder()
+                                    .sessionId(request.sessionId())
+                                    .voiceUrl(url)
+                                    .voiceRole(
+                                            roleStr.equals("CHILD")
+                                                    ? VoiceRole.CHILD
+                                                    : VoiceRole.GREENI
+                                    )
+                                    .diary(diary)
+                                    .build();
+
+                            diary.getVoiceList().add(voice);
+                        }
+                    }
+
+                    //  4. DB 저장 (JPA는 blocking)
+                    return Mono.fromCallable(() -> diaryRepository.save(diary))
+                            .subscribeOn(Schedulers.boundedElastic())
+                            .map(saved -> {
+
+                                // 5. Redis 삭제
+                                redistemplate.delete(key);
+
+                                return AIResponseDTO.DiaryCloseResponse.of(
+                                        saved.getId()
+                                );
+                            });
+                });
+    }
+
 }

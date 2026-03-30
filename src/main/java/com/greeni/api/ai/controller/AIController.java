@@ -76,4 +76,14 @@ public class AIController implements AIControllerDocs {
 		return aiService.diaryClose(request, customUserDetails.getId())
 				.map(dto -> new ResponseEntity<>(CommonResponse.onSuccess(dto), HttpStatus.OK));
 	}
+
+	@Override
+	@PostMapping(value = "/diaries/summarize")
+	public Mono<ResponseEntity<CommonResponse<AIResponseDTO.DiaryCloseResponse>>> diarySummarizeRequest(
+			AIRequestDTO.DiarySummarizeRequest request,
+			CustomUserDetails customUserDetails
+			){
+		return aiService.diarySummarize(request, customUserDetails.getId())
+				.map(dto -> new ResponseEntity<>(CommonResponse.onSuccess(dto), HttpStatus.OK));
+	}
 }

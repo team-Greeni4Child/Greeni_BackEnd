@@ -91,4 +91,16 @@ public interface AIControllerDocs {
 			@Valid @ModelAttribute AIRequestDTO.DiaryCloseRequest request,
 			@AuthenticationPrincipal CustomUserDetails customUserDetails);
 
+	@Operation(
+			summary = "AI: 일기 대화 저장",
+			description = "일기: 일기 대화 내용을 저장하는 API"
+	)
+	@ApiResponses({
+			@ApiResponse(responseCode = "COMMON200", description = "요청이 성공했습니다..",
+					content = @Content(mediaType = "application/json", schema = @Schema(implementation = AIResponseDTO.DiaryCloseResponse.class))),
+	})
+	public Mono<ResponseEntity<CommonResponse<AIResponseDTO.DiaryCloseResponse>>> diarySummarizeRequest(
+			@Valid @ModelAttribute AIRequestDTO.DiarySummarizeRequest request,
+			@AuthenticationPrincipal CustomUserDetails customUserDetails
+	);
 }
