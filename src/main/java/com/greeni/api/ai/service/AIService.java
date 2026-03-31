@@ -248,7 +248,7 @@ public class AIService {
                     log.debug("아이가 한 말: {}", recognizedText);
 
                     AIRequestDTO.DiaryInner diaryReq = new AIRequestDTO.DiaryInner(
-                            request.session_id(), request.user_text()
+                            request.session_id(), recognizedText
                     );
 
                     return aiWebClient.post()
