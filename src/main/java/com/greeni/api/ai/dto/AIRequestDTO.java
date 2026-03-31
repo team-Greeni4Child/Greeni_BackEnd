@@ -169,10 +169,10 @@ public class AIRequestDTO {
 			@Schema(description = "대화 내용을 s3에 올린 후 url", example = "")
 			String voiceUrl,
 
-			@NotBlank(message = "필수 입력입니다.")
-			@Schema(description = "아이의 음성을 텍스트로 변환한 것", example = "")
-			@JsonProperty("user_text")
-			String user_text,
+//			@NotBlank(message = "필수 입력입니다.")
+//			@Schema(description = "아이의 음성을 텍스트로 변환한 것", example = "")
+//			@JsonProperty("user_text")
+//			String user_text,
 
 			@NotNull(message = "필수 입력입니다.")
 			@Schema(description = "음성 파일", example = "")
