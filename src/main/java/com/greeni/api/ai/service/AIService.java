@@ -273,9 +273,16 @@ public class AIService {
                                         .map(ttsRes -> {
                                             if (ttsRes.audioUrl() != null) {
                                                 String aiValue = "GREENI|" + ttsRes.audioUrl();
-                                                ops.rightPush(key, aiValue);
-                                                if (redistemplate.getExpire(key) == -1) {
-                                                    redistemplate.expire(key, 1, TimeUnit.HOURS);
+                                                List<String> existingList = ops.range(key, 0, -1);
+
+                                                if (existingList == null || !existingList.contains(aiValue)) {
+                                                    ops.rightPush(key, aiValue);
+
+                                                    if (redistemplate.getExpire(key) == -1) {
+                                                        redistemplate.expire(key, 1, TimeUnit.HOURS);
+                                                    }
+                                                } else {
+                                                    log.warn("중복 GREENI 음성 감지 - Redis 저장 생략: {}", aiValue);
                                                 }
                                             }
                                             return AIResponseDTO.DiaryResponse.of(
