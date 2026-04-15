@@ -20,5 +20,8 @@ public interface ActivityService {
 	ActivityResponseDTO.ActivityCreateResponse createRolePlayingActivity(Long memberId,
 		ActivityRequestDTO.RolePlayingCreateRequest request);
 
-	void checkTodayActivity(Profile profile);
+	//void checkTodayActivity(Profile profile);
+
+	void checkTodayActivity(Long profileId);
+
 }
