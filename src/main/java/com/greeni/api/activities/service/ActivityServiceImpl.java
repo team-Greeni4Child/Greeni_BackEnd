@@ -123,7 +123,8 @@ public class ActivityServiceImpl implements ActivityService {
 		);
 
 		// 오늘의 첫 활동요약인지 확인하고 저장
-		checkTodayActivity(profile);
+		//checkTodayActivity(profile);
+		checkTodayActivity(profile.getId());
 		activityRepository.save(newActivity);
 
 		// 다섯고개 배지 확인
@@ -147,7 +148,8 @@ public class ActivityServiceImpl implements ActivityService {
 		);
 
 		// 오늘의 첫 활동요약인지 확인하고 저장
-		checkTodayActivity(profile);
+		//checkTodayActivity(profile);
+		checkTodayActivity(profile.getId());
 		activityRepository.save(newActivity);
 
 		// 역할놀이 배지 확인
@@ -157,18 +159,42 @@ public class ActivityServiceImpl implements ActivityService {
 	}
 
 	// 오늘의 첫 활동요약인지 확인
-	@Override
-	public void checkTodayActivity(Profile profile) {
+//	@Override
+//	@Transactional
+//	public void checkTodayActivity(Profile profile) {
+//
+//		// 오늘 날짜 추출
+//		LocalDate today = LocalDate.now();
+//		LocalDateTime startTime = today.atStartOfDay();
+//		LocalDateTime endTime = today.atTime(LocalTime.MAX);
+//
+//		// 프로필 기준 오늘 날짜에 활동요약이 존재하지 않는다면
+//		// 출석 일수 증가 및 출석 배지 확인
+//		if (!activityRepository.existsByProfileAndCreatedAtBetween(profile, startTime, endTime)) {
+//			System.out.println("hello world");
+//			profile.attend();
+//			System.out.println("attendance : " + profile.getAttendance());
+//			badgeService.checkAndAwardBadge(profile, ActivityType.ATTENDANCE);
+//		}
+//	}
 
+	@Override
+	@Transactional
+	public void checkTodayActivity(Long profileId){
 		// 오늘 날짜 추출
 		LocalDate today = LocalDate.now();
 		LocalDateTime startTime = today.atStartOfDay();
 		LocalDateTime endTime = today.atTime(LocalTime.MAX);
 
+		Profile profile = profileRepository.findById(profileId)
+				.orElseThrow(() -> new GeneralException(ProfileErrorStatus.PROFILE_NOT_FOUND));
+
 		// 프로필 기준 오늘 날짜에 활동요약이 존재하지 않는다면
 		// 출석 일수 증가 및 출석 배지 확인
 		if (!activityRepository.existsByProfileAndCreatedAtBetween(profile, startTime, endTime)) {
+
 			profile.attend();
+
 			badgeService.checkAndAwardBadge(profile, ActivityType.ATTENDANCE);
 		}
 	}

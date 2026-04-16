@@ -61,6 +61,7 @@ public class BadgeServiceImpl implements BadgeService {
 
 		long currentCount = getCountByActivityType(profile, activityType);
 
+
 		// 배지 획득 조건에 맞는 경우 배지 획득
 		if (BADGE_THRESHOLDS.contains((int)currentCount)) {
 			awardBadge(profile, activityType, (int)currentCount);
@@ -84,6 +85,7 @@ public class BadgeServiceImpl implements BadgeService {
 
 		// 배지 이름 생성
 		String badgeName = generateBadgeName(activityType, count);
+		System.out.println("badgeName : " + badgeName);
 
 		// 배지 이름 검증
 		Badge badge = badgeRepository.findByName(badgeName)

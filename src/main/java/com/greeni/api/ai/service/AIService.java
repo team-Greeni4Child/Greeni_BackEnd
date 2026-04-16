@@ -1,5 +1,10 @@
 package com.greeni.api.ai.service;
 
+import com.greeni.api.activities.converter.ActivityConverter;
+import com.greeni.api.activities.domain.Activity;
+import com.greeni.api.activities.domain.enums.ActivityType;
+import com.greeni.api.activities.repository.ActivityRepository;
+import com.greeni.api.activities.service.ActivityService;
 import com.greeni.api.ai.domain.Purpose;
 import com.greeni.api.ai.domain.RolePlayingType;
 import com.greeni.api.ai.dto.AIRequestDTO;
@@ -7,6 +12,7 @@ import com.greeni.api.ai.dto.AIResponseDTO;
 import com.greeni.api.apiPayload.handler.GeneralException;
 import com.greeni.api.apiPayload.status.CommonErrorStatus;
 import com.greeni.api.apiPayload.status.DiaryErrorStatus;
+import com.greeni.api.badges.service.BadgeService;
 import com.greeni.api.diaries.domain.Diary;
 import com.greeni.api.diaries.domain.Voice;
 import com.greeni.api.diaries.domain.enums.Emotion;
@@ -47,6 +53,9 @@ public class AIService {
     private final DiaryRepository diaryRepository;
     private final RedisTemplate<String, String> redistemplate;
     private final ProfileQueryService profileQueryService;
+    private final ActivityService activityService;
+    private final ActivityRepository activityRepository;
+    private final BadgeService badgeService;
 
     public Mono<AIResponseDTO.FiveQuestionsHintResponse> fiveQuestionsHint(AIRequestDTO.FiveQuestionsHint request) {
 
@@ -322,6 +331,7 @@ public class AIService {
                 new AIRequestDTO.DiarySummarizeInnerRequest(
                         request.sessionId()
                 );
+
         // db에 저장 후, 프론트에게 값 돌려주기
         // ai에게 대화 요약 요청
         return aiWebClient.post()
@@ -369,18 +379,27 @@ public class AIService {
                         }
                     }
 
-                    //  4. DB 저장 (JPA는 blocking)
-                    return Mono.fromCallable(() -> diaryRepository.save(diary))
-                            .subscribeOn(Schedulers.boundedElastic())
-                            .map(saved -> {
+                    //  4. DB 저장
+                    return Mono.fromCallable(() -> {
+                                // 1. Diary 저장
+                                Diary savedDiary = diaryRepository.save(diary);
 
-                                // 5. Redis 삭제
+                                // 2. Activity 저장
+                                String description = "일기 작성을 완료했습니다.";
+                                Activity newActivity = ActivityConverter.toActivity(
+                                        ActivityType.DIARY, description, profile, null
+                                );
+                                activityService.checkTodayActivity(profile.getId());
+                                activityRepository.save(newActivity);
+
+                                // 3. Badge 체크
+                                badgeService.checkAndAwardBadge(profile, ActivityType.DIARY);
+                                // 4. Redis 삭제
                                 redistemplate.delete(key);
 
-                                return AIResponseDTO.DiaryCloseResponse.of(
-                                        saved.getId()
-                                );
-                            });
+                                return AIResponseDTO.DiaryCloseResponse.of(savedDiary.getId());
+                            })
+                            .subscribeOn(Schedulers.boundedElastic());
                 });
     }
 

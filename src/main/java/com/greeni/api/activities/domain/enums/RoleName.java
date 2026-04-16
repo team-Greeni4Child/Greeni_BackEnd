@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public enum RoleName {
 
-	FRIEND("친구"), STUDENT("학생"), CUSTOMER("손님");
+	FRIEND("친구"), TEACHER("학생"), SHOP("손님");
 
 	private final String name;
 }
