@@ -192,9 +192,9 @@ public class ActivityServiceImpl implements ActivityService {
 		// 프로필 기준 오늘 날짜에 활동요약이 존재하지 않는다면
 		// 출석 일수 증가 및 출석 배지 확인
 		if (!activityRepository.existsByProfileAndCreatedAtBetween(profile, startTime, endTime)) {
-			System.out.println("hello world");
+
 			profile.attend();
-			System.out.println("attendance : " + profile.getAttendance());
+
 			badgeService.checkAndAwardBadge(profile, ActivityType.ATTENDANCE);
 		}
 	}

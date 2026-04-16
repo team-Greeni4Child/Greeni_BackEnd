@@ -389,15 +389,11 @@ public class AIService {
                                 Activity newActivity = ActivityConverter.toActivity(
                                         ActivityType.DIARY, description, profile, null
                                 );
-                                System.out.println("check1");
                                 activityService.checkTodayActivity(profile.getId());
-                                System.out.println("check2");
                                 activityRepository.save(newActivity);
 
                                 // 3. Badge 체크
-                                System.out.println("check3");
                                 badgeService.checkAndAwardBadge(profile, ActivityType.DIARY);
-                                System.out.println("check4");
                                 // 4. Redis 삭제
                                 redistemplate.delete(key);
 
