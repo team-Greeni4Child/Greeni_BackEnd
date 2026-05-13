@@ -1,11 +1,13 @@
 package com.greeni.api.apiPayload.exception;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -34,6 +37,24 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestControllerAdvice(annotations = {RestController.class})
 public class ExceptionAdvice extends ResponseEntityExceptionHandler {
+
+	private final RestTemplate restTemplate = new RestTemplate();
+
+	@Value("${discord.webhook-url}")
+	private String discordWebhookUrl;
+
+	// 디스코드 웹훅 전송 메서드
+	private void sendDiscordNotification(String message) {
+		try {
+			Map<String, String> payload = new HashMap<>();
+			payload.put("content", message);
+
+			// 디스코드로 POST 요청 쏘기
+			restTemplate.postForEntity(discordWebhookUrl, payload, String.class);
+		} catch (Exception e) {
+			System.err.println("디스코드 알림 전송 실패: " + e.getMessage());
+		}
+	}
 
 	// 에러 응답 생성 - String
 	private ResponseEntity<Object> handleExceptionInternal(ErrorReason errorReason, String message) {
@@ -121,9 +142,31 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
 	// 기타 에러 핸들링
 	// 따로 설정하지 않은 모든 예외
-	@ExceptionHandler
+	@ExceptionHandler(value = Exception.class)
 	public ResponseEntity<Object> handleOtherException(Exception e, HttpServletRequest request) {
 		log.error("Unhandled exception occurred on [{} {}]", request.getMethod(), request.getRequestURI(), e);
+
+		// 1. 필요한 추가 정보 추출
+		String method = request.getMethod();
+		String uri = request.getRequestURI();
+		String queryString = request.getQueryString() != null ? "?" + request.getQueryString() : "";
+		String exceptionName = e.getClass().getSimpleName();
+		String message = e.getMessage() != null ? e.getMessage() : "메시지 없음(Null)";
+
+		// 2. 에러가 발생한 정확한 위치 (스택 트레이스 첫 번째 줄)
+		String errorLocation = e.getStackTrace().length > 0 ? e.getStackTrace()[0].toString() : "위치 알 수 없음";
+
+		// 3. 디스코드 가독성을 극대화한 마크다운 포맷팅
+		String errorMessage = String.format(
+			"🚨 **[500 Internal Server Error]** 🚨\n" +
+				"**▪️ Request:** `%s %s%s`\n" +
+				"**▪️ Type:** `%s`\n" +
+				"**▪️ Message:** %s\n" +
+				"**▪️ Location:** `%s`",
+			method, uri, queryString, exceptionName, message, errorLocation
+		);
+
+		sendDiscordNotification(errorMessage);
 
 		return handleExceptionInternal(CommonErrorStatus._INTERNAL_SERVER_ERROR, null);
 	}
