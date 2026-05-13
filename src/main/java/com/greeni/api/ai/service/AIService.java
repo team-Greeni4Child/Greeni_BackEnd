@@ -20,11 +20,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import com.greeni.api.activities.converter.ActivityConverter;
-import com.greeni.api.activities.domain.Activity;
-import com.greeni.api.activities.domain.enums.ActivityType;
-import com.greeni.api.activities.repository.ActivityRepository;
-import com.greeni.api.activities.service.ActivityService;
 import com.greeni.api.ai.domain.Purpose;
 import com.greeni.api.ai.domain.RolePlayingType;
 import com.greeni.api.ai.dto.AIRequestDTO;
@@ -32,12 +27,8 @@ import com.greeni.api.ai.dto.AIResponseDTO;
 import com.greeni.api.apiPayload.handler.GeneralException;
 import com.greeni.api.apiPayload.status.CommonErrorStatus;
 import com.greeni.api.apiPayload.status.DiaryErrorStatus;
-import com.greeni.api.badges.service.BadgeService;
-import com.greeni.api.diaries.domain.Diary;
-import com.greeni.api.diaries.domain.Voice;
-import com.greeni.api.diaries.domain.enums.Emotion;
-import com.greeni.api.diaries.domain.enums.VoiceRole;
 import com.greeni.api.diaries.repository.DiaryRepository;
+import com.greeni.api.diaries.service.DiaryService;
 import com.greeni.api.profiles.domain.Profile;
 import com.greeni.api.profiles.service.ProfileQueryService;
 
@@ -56,11 +47,9 @@ public class AIService {
 
 	private final WebClient aiWebClient;
 	private final DiaryRepository diaryRepository;
-	private final RedisTemplate<String, String> redistemplate;
+	private final RedisTemplate<String, String> redisTemplate;
 	private final ProfileQueryService profileQueryService;
-	private final ActivityService activityService;
-	private final ActivityRepository activityRepository;
-	private final BadgeService badgeService;
+	private final DiaryService diaryService;
 
 	public Mono<AIResponseDTO.FiveQuestionsHintResponse> fiveQuestionsHint(AIRequestDTO.FiveQuestionsHint request) {
 
@@ -71,8 +60,7 @@ public class AIService {
 			.bodyValue(request)
 			.retrieve()
 			.bodyToMono(AIResponseDTO.FiveQuestionsHintText.class)
-			.retryWhen(Retry.backoff(2, Duration.ofSeconds(2))
-				.filter(throwable -> throwable instanceof WebClientRequestException))
+			.retryWhen(webClientRetrySpec())
 			.flatMap(context -> {
 				List<String> hintList = context.hints();
 				if (hintList == null) {
@@ -94,8 +82,7 @@ public class AIService {
 							.bodyValue(ttsRequest)
 							.retrieve()
 							.bodyToMono(AIResponseDTO.TTSResponse.class)
-							.retryWhen(Retry.backoff(2, Duration.ofSeconds(2))
-								.filter(throwable -> throwable instanceof WebClientRequestException))
+							.retryWhen(webClientRetrySpec())
 							.doOnError(WebClientResponseException.class, e -> {
 								log.error("TTS 에러: {}", e.getResponseBodyAsString());
 							})
@@ -113,40 +100,39 @@ public class AIService {
 
 		Purpose purpose = Purpose.FIVEQ;
 
-		MultipartBodyBuilder builder = buildVoiceMultipart(request.voice(), purpose, null);
-
-		return aiWebClient.post()
-			.uri("/stt/transcribe")
-			.body(BodyInserters.fromMultipartData(builder.build()))
-			.retrieve()
-			.bodyToMono(AIResponseDTO.STTResponse.class)
-			.retryWhen(Retry.backoff(2, Duration.ofSeconds(2))
-				.filter(throwable -> throwable instanceof WebClientRequestException))
-			.doOnError(WebClientResponseException.class, e -> {
-				log.error("STT 에러: {}", e.getResponseBodyAsString());
-			})
-			.flatMap(sttRes -> {
-				String recognizedText = sttRes.text();
-				log.debug("아이가 한 말: {}", recognizedText);
-
-				AIRequestDTO.FiveQuestionsCheckInner checkInnerReq = new AIRequestDTO.FiveQuestionsCheckInner(
-					recognizedText,
-					request.answer()
-				);
-
+		return buildVoiceMultipart(request.voice(), purpose, null)
+			.flatMap(builder -> {
 				return aiWebClient.post()
-					.uri("/game/fiveq/check")
-					.bodyValue(checkInnerReq)
+					.uri("/stt/transcribe")
+					.body(BodyInserters.fromMultipartData(builder.build()))
 					.retrieve()
-					.bodyToMono(AIResponseDTO.FiveQuestionsCheckAnswer.class)
-					.retryWhen(Retry.backoff(2, Duration.ofSeconds(2))
-						.filter(throwable -> throwable instanceof WebClientRequestException))
-					.doOnError(e -> log.error("FiveQ Check 에러: {}", e.getMessage()))
-					.map(checkAns -> {
-						Boolean correct = checkAns.correct();
-						return AIResponseDTO.FiveQuestionsCheckResponse.of(
-							correct, null
+					.bodyToMono(AIResponseDTO.STTResponse.class)
+					.retryWhen(webClientRetrySpec())
+					.doOnError(WebClientResponseException.class, e -> {
+						log.error("STT 에러: {}", e.getResponseBodyAsString());
+					})
+					.flatMap(sttRes -> {
+						String recognizedText = sttRes.text();
+						log.debug("아이가 한 말: {}", recognizedText);
+
+						AIRequestDTO.FiveQuestionsCheckInner checkInnerReq = new AIRequestDTO.FiveQuestionsCheckInner(
+							recognizedText,
+							request.answer()
 						);
+
+						return aiWebClient.post()
+							.uri("/game/fiveq/check")
+							.bodyValue(checkInnerReq)
+							.retrieve()
+							.bodyToMono(AIResponseDTO.FiveQuestionsCheckAnswer.class)
+							.retryWhen(webClientRetrySpec())
+							.doOnError(e -> log.error("FiveQ Check 에러: {}", e.getMessage()))
+							.map(checkAns -> {
+								Boolean correct = checkAns.correct();
+								return AIResponseDTO.FiveQuestionsCheckResponse.of(
+									correct, null
+								);
+							});
 					});
 			});
 	}
@@ -156,51 +142,50 @@ public class AIService {
 		Purpose purpose = Purpose.ROLEPLAY;
 		RolePlayingType type = RolePlayingType.valueOf(request.role().toUpperCase());
 
-		MultipartBodyBuilder builder = buildVoiceMultipart(request.voice(), purpose, null);
-
-		return aiWebClient.post()
-			.uri("/stt/transcribe")
-			.body(BodyInserters.fromMultipartData(builder.build()))
-			.retrieve()
-			.bodyToMono(AIResponseDTO.STTResponse.class)
-			.retryWhen(Retry.backoff(2, Duration.ofSeconds(2))
-				.filter(throwable -> throwable instanceof WebClientRequestException))
-			.doOnError(WebClientResponseException.class, e -> {
-				log.error("STT 에러: {}", e.getResponseBodyAsString());
-			})
-			.flatMap(sttRes -> {
-				String recognizedText = sttRes.text();
-				log.debug("아이가 한 말: {}", recognizedText);
-
-				AIRequestDTO.RolePlayingInner rolePlayingReq = new AIRequestDTO.RolePlayingInner(
-					request.sessionId(), type, recognizedText, null, null, null
-				);
-
+		// buildVoiceMultipart의 반환값이 Mono이므로 flatMap으로 체이닝
+		return buildVoiceMultipart(request.voice(), purpose, null)
+			.flatMap(builder -> {
 				return aiWebClient.post()
-					.uri("/chat/roleplay")
-					.bodyValue(rolePlayingReq)
+					.uri("/stt/transcribe")
+					.body(BodyInserters.fromMultipartData(builder.build()))
 					.retrieve()
-					.bodyToMono(AIResponseDTO.RolePlayingInnerResponse.class)
-					.retryWhen(Retry.backoff(2, Duration.ofSeconds(2))
-						.filter(throwable -> throwable instanceof WebClientRequestException))
-					.doOnError(e -> log.error("RolePlaying 에러: {}", e.getMessage()))
-					.flatMap(roleRes -> {
-						AIRequestDTO.TTSRequest ttsRequest = new AIRequestDTO.TTSRequest(
-							purpose, roleRes.reply(), null, null, null
+					.bodyToMono(AIResponseDTO.STTResponse.class)
+					.retryWhen(webClientRetrySpec())
+					.doOnError(WebClientResponseException.class, e -> {
+						log.error("STT 에러: {}", e.getResponseBodyAsString());
+					})
+					.flatMap(sttRes -> {
+						String recognizedText = sttRes.text();
+						log.debug("아이가 한 말: {}", recognizedText);
+
+						AIRequestDTO.RolePlayingInner rolePlayingReq = new AIRequestDTO.RolePlayingInner(
+							request.sessionId(), type, recognizedText, null, null, null
 						);
+
 						return aiWebClient.post()
-							.uri("/tts/speak")
-							.bodyValue(ttsRequest)
+							.uri("/chat/roleplay")
+							.bodyValue(rolePlayingReq)
 							.retrieve()
-							.bodyToMono(AIResponseDTO.TTSResponse.class)
-							.retryWhen(Retry.backoff(2, Duration.ofSeconds(2))
-								.filter(throwable -> throwable instanceof WebClientRequestException))
-							.doOnError(WebClientResponseException.class, e -> {
-								log.error("TTS 에러: {}", e.getResponseBodyAsString());
-							})
-							.map(base64Audio -> AIResponseDTO.RolePlayingResponse.of(
-								request.sessionId(), base64Audio.audioContent(), roleRes.reply(), roleRes.turn()
-							));
+							.bodyToMono(AIResponseDTO.RolePlayingInnerResponse.class)
+							.retryWhen(webClientRetrySpec())
+							.doOnError(e -> log.error("RolePlaying 에러: {}", e.getMessage()))
+							.flatMap(roleRes -> {
+								AIRequestDTO.TTSRequest ttsRequest = new AIRequestDTO.TTSRequest(
+									purpose, roleRes.reply(), null, null, null
+								);
+								return aiWebClient.post()
+									.uri("/tts/speak")
+									.bodyValue(ttsRequest)
+									.retrieve()
+									.bodyToMono(AIResponseDTO.TTSResponse.class)
+									.retryWhen(webClientRetrySpec())
+									.doOnError(WebClientResponseException.class, e -> {
+										log.error("TTS 에러: {}", e.getResponseBodyAsString());
+									})
+									.map(base64Audio -> AIResponseDTO.RolePlayingResponse.of(
+										request.sessionId(), base64Audio.audioContent(), roleRes.reply(), roleRes.turn()
+									));
+							});
 					});
 			});
 	}
@@ -211,227 +196,190 @@ public class AIService {
 			.bodyValue(request)
 			.retrieve()
 			.bodyToMono(AIResponseDTO.RolePlayingEndResponse.class)
-			.retryWhen(Retry.backoff(2, Duration.ofSeconds(2))
-				.filter(throwable -> throwable instanceof WebClientRequestException))
+			.retryWhen(webClientRetrySpec())
 			.map(result -> AIResponseDTO.RolePlayingEndResponse.of(request.sessionId()));
 	}
 
-	private MultipartBodyBuilder buildVoiceMultipart(MultipartFile voice, Purpose purpose, String sessionId) {
+	private Mono<MultipartBodyBuilder> buildVoiceMultipart(MultipartFile voice, Purpose purpose, String sessionId) {
+		return Mono.fromCallable(() -> {
+			MultipartBodyBuilder builder = new MultipartBodyBuilder();
 
-		MultipartBodyBuilder builder = new MultipartBodyBuilder();
+			try {
+				byte[] voiceBytes = voice.getBytes();
+				String originalFileName = voice.getOriginalFilename();
 
-		try {
-			byte[] voiceBytes = voice.getBytes();
-			String originalFileName = voice.getOriginalFilename();
+				if (originalFileName == null || originalFileName.isEmpty()) {
+					originalFileName = "audio.mp4";
+				}
 
-			if (originalFileName == null || originalFileName.isEmpty()) {
-				originalFileName = "audio.mp4";
+				builder.part("voice", new ByteArrayResource(voiceBytes))
+					.filename(originalFileName)
+					.contentType(MediaType.parseMediaType("audio/mp4"));
+			} catch (IOException e) {
+				throw new GeneralException(CommonErrorStatus.VOICE_PARSING_ERROR);
 			}
 
-			builder.part("voice", new ByteArrayResource(voiceBytes))
-				.filename(originalFileName)
-				.contentType(MediaType.parseMediaType("audio/mp4"));
-		} catch (IOException e) {
-			throw new GeneralException(CommonErrorStatus.VOICE_PARSING_ERROR);
-		}
-		builder.part("purpose", purpose.getName());
-		if (sessionId != null) {
-			builder.part("session_id", sessionId);
-		}
+			builder.part("purpose", purpose.getName());
+			if (sessionId != null) {
+				builder.part("session_id", sessionId);
+			}
 
-		return builder;
+			return builder;
+		}).subscribeOn(Schedulers.boundedElastic());
 	}
 
 	// 일기 대화 요청 로직
 	public Mono<AIResponseDTO.DiaryResponse> diary(AIRequestDTO.DiaryRequest request, Long memberId) {
-		// 프론트에서 받은 s3 redis에 저장하는 로직
-		Profile profile = profileQueryService.findProfileAndValidate(request.profileId(), memberId);
 
-		if (diaryRepository.findByProfileIdAndDiaryDate(profile.getId(), LocalDate.now()).isPresent()) {
-			throw new GeneralException(DiaryErrorStatus.EXIST_TODAY_DIARY);
-		}
+		return Mono.fromCallable(() -> {
+				Profile profile = profileQueryService.findProfileAndValidate(request.profileId(), memberId);
 
-		ListOperations<String, String> ops = redistemplate.opsForList();
-		String key = "diary:voice:" + memberId + ":" + request.profileId();
-		String value = "CHILD|" + request.voiceUrl();
-		ops.rightPush(key, value);
-		if (redistemplate.getExpire(key) == -1) {
-			redistemplate.expire(key, 1, TimeUnit.HOURS);
-		}
+				if (diaryRepository.findByProfileIdAndDiaryDate(profile.getId(), LocalDate.now()).isPresent()) {
+					throw new GeneralException(DiaryErrorStatus.EXIST_TODAY_DIARY);
+				}
 
-		// 일기 요청 대화 로직
-		Purpose purpose = Purpose.DIARY;
+				ListOperations<String, String> ops = redisTemplate.opsForList();
+				String key = "diary:voice:" + memberId + ":" + request.profileId();
+				String value = "CHILD|" + request.voiceUrl();
+				ops.rightPush(key, value);
 
-		MultipartBodyBuilder builder = buildVoiceMultipart(request.voice(), purpose, null);
+				if (redisTemplate.getExpire(key) == -1) {
+					redisTemplate.expire(key, 1, TimeUnit.HOURS);
+				}
 
-		return aiWebClient.post()
-			.uri("/stt/transcribe")
-			.body(BodyInserters.fromMultipartData(builder.build()))
-			.retrieve()
-			.bodyToMono(AIResponseDTO.STTResponse.class)
-			.retryWhen(Retry.backoff(2, Duration.ofSeconds(2))
-				.filter(throwable -> throwable instanceof WebClientRequestException))
-			.doOnError(WebClientResponseException.class, e -> {
-				log.error("STT 에러: {}", e.getResponseBodyAsString());
+				return profile;
 			})
-			.flatMap(sttRes -> {
-				String recognizedText = sttRes.text();
-				log.debug("아이가 한 말: {}", recognizedText);
+			.subscribeOn(Schedulers.boundedElastic())
+			.flatMap(profile -> {
+				Purpose purpose = Purpose.DIARY;
 
-				AIRequestDTO.DiaryInner diaryReq = new AIRequestDTO.DiaryInner(
-					request.session_id(), recognizedText
-				);
-
-				return aiWebClient.post()
-					.uri("/diary/chat")
-					.bodyValue(diaryReq)
-					.retrieve()
-					.bodyToMono(AIResponseDTO.DiaryInnerResponse.class)
-					.retryWhen(Retry.backoff(2, Duration.ofSeconds(2))
-						.filter(throwable -> throwable instanceof WebClientRequestException))
-					.doOnError(e -> log.error("Diary 에러: {}", e.getMessage()))
-					.flatMap(diaryInnerResponse -> {
-						AIRequestDTO.TTSRequest ttsRequest = new AIRequestDTO.TTSRequest(
-							purpose, diaryInnerResponse.reply(), null, null, null
-						);
+				// 💡 비동기 체이닝으로 MultipartBodyBuilder 생성 후 WebClient 요청
+				return buildVoiceMultipart(request.voice(), purpose, null)
+					.flatMap(builder -> {
 						return aiWebClient.post()
-							.uri("/tts/speak")
-							.bodyValue(ttsRequest)
+							.uri("/stt/transcribe")
+							.body(BodyInserters.fromMultipartData(builder.build()))
 							.retrieve()
-							.bodyToMono(AIResponseDTO.TTSResponse.class)
-							.retryWhen(Retry.backoff(2, Duration.ofSeconds(2))
-								.filter(throwable -> throwable instanceof WebClientRequestException))
+							.bodyToMono(AIResponseDTO.STTResponse.class)
+							.retryWhen(webClientRetrySpec())
 							.doOnError(WebClientResponseException.class, e ->
-								log.error("TTS 에러: {}", e.getResponseBodyAsString())
+								log.error("STT 에러: {}", e.getResponseBodyAsString())
 							)
-							// ai서버로부터 온 s3 url 저장 로직
-							.map(ttsRes -> {
-								if (ttsRes.audioUrl() != null) {
-									String aiValue = "GREENI|" + ttsRes.audioUrl();
-									List<String> existingList = ops.range(key, 0, -1);
+							.flatMap(sttRes -> {
+								String recognizedText = sttRes.text();
+								log.debug("아이가 한 말: {}", recognizedText);
 
-									if (existingList == null || !existingList.contains(aiValue)) {
-										ops.rightPush(key, aiValue);
-
-										if (redistemplate.getExpire(key) == -1) {
-											redistemplate.expire(key, 1, TimeUnit.HOURS);
-										}
-									} else {
-										log.warn("중복 GREENI 음성 감지 - Redis 저장 생략: {}", aiValue);
-									}
-								}
-								return AIResponseDTO.DiaryResponse.of(
-									request.session_id(),
-									ttsRes.audioContent(),
-									diaryInnerResponse.reply(),
-									diaryInnerResponse.turn_count()
+								AIRequestDTO.DiaryInner diaryReq = new AIRequestDTO.DiaryInner(
+									request.session_id(), recognizedText
 								);
+
+								return aiWebClient.post()
+									.uri("/diary/chat")
+									.bodyValue(diaryReq)
+									.retrieve()
+									.bodyToMono(AIResponseDTO.DiaryInnerResponse.class)
+									.retryWhen(webClientRetrySpec())
+									.doOnError(e -> log.error("Diary 에러: {}", e.getMessage()))
+									.flatMap(diaryInnerResponse -> {
+										AIRequestDTO.TTSRequest ttsRequest = new AIRequestDTO.TTSRequest(
+											purpose, diaryInnerResponse.reply(), null, null, null
+										);
+
+										return aiWebClient.post()
+											.uri("/tts/speak")
+											.bodyValue(ttsRequest)
+											.retrieve()
+											.bodyToMono(AIResponseDTO.TTSResponse.class)
+											.retryWhen(webClientRetrySpec())
+											.doOnError(WebClientResponseException.class, e ->
+												log.error("TTS 에러: {}", e.getResponseBodyAsString())
+											)
+											.flatMap(ttsRes -> Mono.fromCallable(() -> {
+												if (ttsRes.audioUrl() != null) {
+													String key = "diary:voice:" + memberId + ":" + request.profileId();
+													ListOperations<String, String> ops = redisTemplate.opsForList();
+													String aiValue = "GREENI|" + ttsRes.audioUrl();
+													List<String> existingList = ops.range(key, 0, -1);
+
+													if (existingList == null || !existingList.contains(aiValue)) {
+														ops.rightPush(key, aiValue);
+														if (redisTemplate.getExpire(key) == -1) {
+															redisTemplate.expire(key, 1, TimeUnit.HOURS);
+														}
+													} else {
+														log.warn("중복 GREENI 음성 감지 - Redis 저장 생략: {}", aiValue);
+													}
+												}
+												return AIResponseDTO.DiaryResponse.of(
+													request.session_id(),
+													ttsRes.audioContent(),
+													diaryInnerResponse.reply(),
+													diaryInnerResponse.turn_count()
+												);
+											}).subscribeOn(Schedulers.boundedElastic()));
+									});
 							});
 					});
 			});
 	}
 
 	public Mono<?> diaryClose(AIRequestDTO.DiaryCloseRequest request, Long memberId) {
-		// ai에게 대화 종료 요청 (ended)
-		Profile profile = profileQueryService.findProfileAndValidate(request.profileId(), memberId);
-		String key = "diary:voice:" + memberId + ":" + request.profileId();
-		return aiWebClient.post()
-			.uri("/diary/end")
-			.bodyValue(request)   // session_id 포함된 DTO
-			.retrieve()
-			.bodyToMono(AIResponseDTO.DiaryAbnormalEndInnerResponse.class)
-			.retryWhen(Retry.backoff(2, Duration.ofSeconds(2))
-				.filter(throwable -> throwable instanceof WebClientRequestException))
-			.doOnError(WebClientResponseException.class, e ->
-				log.error("Diary End 에러: {}", e.getResponseBodyAsString())
-			)
-			.doOnSuccess(res -> {
-				redistemplate.delete(key);
+		return Mono.fromCallable(() -> profileQueryService.findProfileAndValidate(request.profileId(), memberId))
+			.subscribeOn(Schedulers.boundedElastic())
+			.flatMap(profile -> {
+				String key = "diary:voice:" + memberId + ":" + request.profileId();
+
+				return aiWebClient.post()
+					.uri("/diary/end")
+					.bodyValue(request)
+					.retrieve()
+					.bodyToMono(AIResponseDTO.DiaryAbnormalEndInnerResponse.class)
+					.retryWhen(webClientRetrySpec())
+					.doOnError(WebClientResponseException.class, e ->
+						log.error("Diary End 에러: {}", e.getResponseBodyAsString())
+					)
+					.flatMap(res -> Mono.fromRunnable(() -> redisTemplate.delete(key))
+						.subscribeOn(Schedulers.boundedElastic())
+						.thenReturn(res)
+					);
 			});
 	}
 
-	@Transactional
 	public Mono<AIResponseDTO.DiaryCloseResponse> diarySummarize(AIRequestDTO.DiarySummarizeRequest request,
 		Long memberId) {
-		Profile profile = profileQueryService.findProfileAndValidate(request.profileId(), memberId);
-		String key = "diary:voice:" + memberId + ":" + request.profileId();
 
-		AIRequestDTO.DiarySummarizeInnerRequest innerReq =
-			new AIRequestDTO.DiarySummarizeInnerRequest(
-				request.sessionId()
-			);
+		return Mono.fromCallable(() -> profileQueryService.findProfileAndValidate(request.profileId(), memberId))
+			.subscribeOn(Schedulers.boundedElastic())
+			.flatMap(profile -> {
+				String key = "diary:voice:" + memberId + ":" + request.profileId();
+				AIRequestDTO.DiarySummarizeInnerRequest innerReq = new AIRequestDTO.DiarySummarizeInnerRequest(
+					request.sessionId());
 
-		// db에 저장 후, 프론트에게 값 돌려주기
-		// ai에게 대화 요약 요청
-		return aiWebClient.post()
-			.uri("/diary/summarize")
-			.bodyValue(innerReq)
-			.retrieve()
-			.bodyToMono(AIResponseDTO.DiarySummarizeInnerResponse.class)
-			.retryWhen(Retry.backoff(2, Duration.ofSeconds(2))
-				.filter(throwable -> throwable instanceof WebClientRequestException))
-			.doOnError(WebClientResponseException.class, e ->
-				log.error("Diary Summarize 에러: {}", e.getResponseBodyAsString())
-			)
-			.flatMap(aiRes -> {
-				//  1. Redis에서 voice 리스트 조회
-				List<String> voiceRawList = redistemplate.opsForList().range(key, 0, -1);
-
-				//  2. Diary 생성
-				Diary diary = Diary.builder()
-					.diaryImage(request.imageUrl())
-					.summary(aiRes.summary())
-					.emotion(Emotion.from(aiRes.emotion().primary()))
-					.keyword(aiRes.keyword())
-					.diaryDate(LocalDate.now())
-					.profile(profile)
-					.build();
-
-				//  3. Voice 변환
-				if (voiceRawList != null) {
-					for (String raw : voiceRawList) {
-
-						String[] parts = raw.split("\\|");
-						String roleStr = parts[0];
-						String url = parts[1];
-
-						Voice voice = Voice.builder()
-							.sessionId(request.sessionId())
-							.voiceUrl(url)
-							.voiceRole(
-								roleStr.equals("CHILD")
-									? VoiceRole.CHILD
-									: VoiceRole.GREENI
+				return aiWebClient.post()
+					.uri("/diary/summarize")
+					.bodyValue(innerReq)
+					.retrieve()
+					.bodyToMono(AIResponseDTO.DiarySummarizeInnerResponse.class)
+					.retryWhen(webClientRetrySpec())
+					.doOnError(WebClientResponseException.class, e ->
+						log.error("Diary Summarize 에러: {}", e.getResponseBodyAsString())
+					)
+					.flatMap(aiRes -> {
+						return Mono.fromCallable(() ->
+							diaryService.finalizeDiaryAndActivities(
+								profile,
+								request.sessionId(),
+								request.imageUrl(),
+								aiRes,
+								key
 							)
-							.diary(diary)
-							.build();
-
-						diary.getVoiceList().add(voice);
-					}
-				}
-
-				//  4. DB 저장
-				return Mono.fromCallable(() -> {
-						// 1. Diary 저장
-						Diary savedDiary = diaryRepository.save(diary);
-
-						// 2. Activity 저장
-						String description = "일기 작성을 완료했습니다.";
-						Activity newActivity = ActivityConverter.toActivity(
-							ActivityType.DIARY, description, profile, null
-						);
-						activityService.checkTodayActivity(profile.getId());
-						activityRepository.save(newActivity);
-
-						// 3. Badge 체크
-						badgeService.checkAndAwardBadge(profile, ActivityType.DIARY);
-						// 4. Redis 삭제
-						redistemplate.delete(key);
-
-						return AIResponseDTO.DiaryCloseResponse.of(savedDiary.getId());
-					})
-					.subscribeOn(Schedulers.boundedElastic());
+						).subscribeOn(Schedulers.boundedElastic());
+					});
 			});
 	}
 
+	private Retry webClientRetrySpec() {
+		return Retry.backoff(2, Duration.ofSeconds(2))
+			.filter(throwable -> throwable instanceof WebClientRequestException);
+	}
 }
