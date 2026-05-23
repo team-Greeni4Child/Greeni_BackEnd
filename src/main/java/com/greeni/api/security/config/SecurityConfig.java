@@ -73,7 +73,7 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(List.of("http://localhost:8080", "http://localhost:8081"));
+		configuration.setAllowedOrigins(List.of("https://api.greeni.store","http://localhost:8080", "http://localhost:8081"));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(List.of("Authorization", "Refresh-Token", "Content-Type"));
 		configuration.setExposedHeaders(List.of("Authorization", "Refresh-Token", "Content-Type"));
